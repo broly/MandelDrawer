@@ -23,4 +23,6 @@ int main()
 	M.Start();
 
 	M.PrintFinishInfo();
+
+	std::cout << "Good bye";
 }
