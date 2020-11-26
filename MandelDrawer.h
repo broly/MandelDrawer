@@ -25,7 +25,7 @@ enum class EMandelDrawMethod
 class MandelDrawer
 {
 public:
-	MandelDrawer(Point2D InDimension, int InNumThreads, int InIterLimit, int InEscapeValue, float InBrightness, EMandelDrawMethod InMandelDrawMethod)
+	MandelDrawer(Point2D InDimension, int InNumThreads, int InIterLimit, int InEscapeValue, float InBrightness, EMandelDrawMethod InMandelDrawMethod, float Scale, float ShiftX, float ShiftY)
 		: Dimension(InDimension)
 		, FractalPicture(Image(InDimension))
 		, NumThreads(InNumThreads)
@@ -33,6 +33,9 @@ public:
 		, EscapeValue(InEscapeValue)
 		, Brightness(InBrightness)
 		, MandelDrawMethod(InMandelDrawMethod)
+		, Scaler(Scale)
+		, ShifterX(ShiftX)
+		, ShifterY(ShiftY)
 	{}
 
 	void Start()
@@ -102,8 +105,8 @@ public:
 
 			for (uint64 y = ChunkPosition.Y; y < ChunkPosition.Y + ChunkSize.Y; y++)
 			{
-				float X = (x - (Dimension.X / 2.f)) / (Dimension.X * 0.5) - 0.5;
-				float Y = (y - (Dimension.Y / 2.f)) / (Dimension.Y * 0.5);
+				float X = (x - (Dimension.X / ShifterX)) / (Dimension.X * Scaler) - 0.5;
+				float Y = (y - (Dimension.Y / ShifterY)) / (Dimension.Y * Scaler);
 				std::complex<double> c(X, Y);
 				float m = mandelbrot(c);
 
@@ -130,8 +133,8 @@ public:
 
 			for (int y = 0; y < Dimension.Y; y++)
 			{
-				float X = (x - (Dimension.X / 2.f)) / (Dimension.X * 0.5) - 0.5;
-				float Y = (y - (Dimension.Y / 2.f)) / (Dimension.Y * 0.5);
+				float X = (x - (Dimension.X / ShifterX)) / (Dimension.X * Scaler) - 0.5;
+				float Y = (y - (Dimension.Y / ShifterY)) / (Dimension.Y * Scaler);
 				std::complex<double> c(X, Y);
 				float m = mandelbrot(c);
 
@@ -190,6 +193,9 @@ public:
 	int IterLimit;
 	int EscapeValue;
 	float Brightness;
+	float Scaler;
+	float ShifterX;
+	float ShifterY;
 	EMandelDrawMethod MandelDrawMethod;
 	std::clock_t StartTime;
 	std::clock_t DoneTime;
