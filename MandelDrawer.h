@@ -34,8 +34,7 @@ public:
 		, Brightness(InBrightness)
 		, MandelDrawMethod(InMandelDrawMethod)
 		, Scaler(Scale)
-		, ShifterX(ShiftX)
-		, ShifterY(ShiftY)
+		, Shifter(ShiftX, ShiftY)
 	{}
 
 	void Start()
@@ -105,8 +104,8 @@ public:
 
 			for (uint64 y = ChunkPosition.Y; y < ChunkPosition.Y + ChunkSize.Y; y++)
 			{
-				float X = (x - (Dimension.X / ShifterX)) / (Dimension.X * Scaler) - 0.5;
-				float Y = (y - (Dimension.Y / ShifterY)) / (Dimension.Y * Scaler);
+				float X = (x - (Dimension.X / 2.0f)) / (Dimension.X * Scaler) - Shifter.X;
+				float Y = (y - (Dimension.Y / 2.0f)) / (Dimension.Y * Scaler) - Shifter.Y;
 				std::complex<double> c(X, Y);
 				float m = mandelbrot(c);
 
@@ -133,8 +132,8 @@ public:
 
 			for (int y = 0; y < Dimension.Y; y++)
 			{
-				float X = (x - (Dimension.X / ShifterX)) / (Dimension.X * Scaler) - 0.5;
-				float Y = (y - (Dimension.Y / ShifterY)) / (Dimension.Y * Scaler);
+				float X = (x - (Dimension.X / 2.0f)) / (Dimension.X * Scaler) - Shifter.X;
+				float Y = (y - (Dimension.Y / 2.0f)) / (Dimension.Y * Scaler) - Shifter.Y;
 				std::complex<double> c(X, Y);
 				float m = mandelbrot(c);
 
@@ -194,8 +193,7 @@ public:
 	int EscapeValue;
 	float Brightness;
 	float Scaler;
-	float ShifterX;
-	float ShifterY;
+	Point2D Shifter;
 	EMandelDrawMethod MandelDrawMethod;
 	std::clock_t StartTime;
 	std::clock_t DoneTime;

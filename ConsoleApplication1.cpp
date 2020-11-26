@@ -11,8 +11,8 @@
 #define ESCAPE_VALUE 20
 #define BRIGHTNESS 1
 #define SCALE 0.5
-#define SHIFTX 3
-#define SHIFTY 0
+#define SHIFTX 1
+#define SHIFTY 1
 
 int main()
 {
