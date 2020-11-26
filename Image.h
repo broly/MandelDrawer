@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Color.h"
-#include "Point2D.h"
+#include "Vector2D.h"
 #include "Types.h"
 
 const int BYTES_PER_PIXEL = 3;
@@ -14,9 +14,9 @@ class EImageOutOfBoundsException : public std::exception
 
 struct Image
 {
-	Image(Point2D InDimension)
+	Image(IntVector2D InDimension)
 		: Dimension(InDimension)
-		, Size(InDimension.X* InDimension.Y)
+		, Size(InDimension.X * InDimension.Y)
 		, Data(new Color[Size])
 	{}
 
@@ -25,20 +25,20 @@ struct Image
 		delete[] Data;
 	}
 
-	Point2D Dimension;
+	IntVector2D Dimension;
 	int Size;
 	Color* Data;
 
 	Color GetColor(int X, int Y)
 	{
-		int Index = GetIndex(X, Y);
+		uint64 Index = GetIndex(X, Y);
 		return Data[Index];
 	}
 
 	void SetColor(int X, int Y, Color InColor)
 	{
 		
-		int Index = GetIndex(X, Y);
+		uint64 Index = GetIndex(X, Y);
 		Data[Index] = InColor;
 	}
 
@@ -69,9 +69,9 @@ struct Image
 				int x = i;
 				int y = (Height - 1) - j;
 				Color color = GetColor(i, j);
-				int r = color.R * 255;
-				int g = color.B * 255;
-				int b = color.G * 255;
+				int r = (int)(color.R * 255);
+				int g = (int)(color.B * 255);
+				int b = (int)(color.G * 255);
 				if (r > 255) r = 255;
 				if (g > 255) g = 255;
 				if (b > 255) b = 255;

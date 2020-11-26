@@ -2,7 +2,7 @@
 #include <complex>
 #include <functional>
 #include "Image.h"
-#include "Point2D.h"
+#include "Vector2D.h"
 #include <thread>
 #include <vector>
 #include <numeric>
@@ -25,7 +25,7 @@ enum class EMandelDrawMethod
 class MandelDrawer
 {
 public:
-	MandelDrawer(Point2D InDimension, int InNumThreads, int InIterLimit, int InEscapeValue, float InBrightness, EMandelDrawMethod InMandelDrawMethod, float Scale, float ShiftX, float ShiftY)
+	MandelDrawer(IntVector2D InDimension, int InNumThreads, int InIterLimit, float InEscapeValue, float InBrightness, EMandelDrawMethod InMandelDrawMethod, float Scale, FloatVector2D Offset)
 		: Dimension(InDimension)
 		, FractalPicture(Image(InDimension))
 		, NumThreads(InNumThreads)
@@ -34,7 +34,7 @@ public:
 		, Brightness(InBrightness)
 		, MandelDrawMethod(InMandelDrawMethod)
 		, Scaler(Scale)
-		, Shifter(ShiftX, ShiftY)
+		, Shifter(Offset)
 	{}
 
 	void Start()
@@ -96,13 +96,13 @@ public:
 	void Draw_ByChunk(int WorkerID)
 	{
 		int ChunkSizeX = Dimension.X / NumThreads;
-		Point2D ChunkPosition = { ChunkSizeX * WorkerID, 0 };
-		Point2D ChunkSize = { ChunkSizeX, Dimension.Y };
-		for (uint64 x = ChunkPosition.X; x < ChunkPosition.X + ChunkSize.X; x++)
+		IntVector2D ChunkPosition = { ChunkSizeX * WorkerID, 0 };
+		IntVector2D ChunkSize = { ChunkSizeX, Dimension.Y };
+		for (int x = ChunkPosition.X; x < ChunkPosition.X + ChunkSize.X; x++)
 		{
 			float percents = float(x) / ChunkSize.Y;
 
-			for (uint64 y = ChunkPosition.Y; y < ChunkPosition.Y + ChunkSize.Y; y++)
+			for (int y = ChunkPosition.Y; y < ChunkPosition.Y + ChunkSize.Y; y++)
 			{
 				float X = (x - (Dimension.X / 2.0f)) / (Dimension.X * Scaler) - Shifter.X;
 				float Y = (y - (Dimension.Y / 2.0f)) / (Dimension.Y * Scaler) - Shifter.Y;
@@ -111,7 +111,7 @@ public:
 
 				Color color;
 				color.R = m / IterLimit;
-				color.G = m < IterLimit ? 0 : 1;
+				color.G = m < IterLimit ? 0.f : 1.f;
 				color.B = 0;
 				FractalPicture.SetColor(x, y, color);
 			}
@@ -132,14 +132,15 @@ public:
 
 			for (int y = 0; y < Dimension.Y; y++)
 			{
-				float X = (x - (Dimension.X / 2.0f)) / (Dimension.X * Scaler) - Shifter.X;
-				float Y = (y - (Dimension.Y / 2.0f)) / (Dimension.Y * Scaler) - Shifter.Y;
-				std::complex<double> c(X, Y);
+				const FloatVector2D Point_Screen = {x, y};
+				const FloatVector2D Point_Rel = (Point_Screen - Dimension/2.f) / (Dimension * Scaler) - Shifter;
+				
+				std::complex<double> c(Point_Rel.X, Point_Rel.Y);
 				float m = mandelbrot(c);
 
 				Color color;
 				color.R = m / IterLimit;
-				color.G = m < IterLimit ? 0 : 1;
+				color.G = m < IterLimit ? 0.f : 1.f;
 				color.B = 0;
 				FractalPicture.SetColor(x, y, color);
 			}
@@ -165,35 +166,41 @@ public:
 		std::cout << "Finished in: " << (DoneTime - StartTime) / CLOCKS_PER_SEC << " sec." << std::endl;
 	}
 
+	float IsEscaping(std::complex<float> z) const
+	{
+		// same as "abs(z) <= EscapeValue", but little bit faster
+		return z.real() * z.imag() <= EscapeValue * EscapeValue;
+	}
+
 
 	float mandelbrot(std::complex<double> c)
 	{
 		std::complex<double> z = c;
 		int n = 0;
-		while (abs(z) <= EscapeValue and n < IterLimit)
+		while (IsEscaping(z) and n < IterLimit)
 		{
 			z = std::pow(z, -2) + c;
 			n += 1;
 		}
 
 		if (n == IterLimit)
-			return IterLimit;
+			return (float)IterLimit;
 
 		return (n + 1 - log(log2(abs(z)))) * Brightness;
 
 	}
 
 
-	Point2D Dimension;
+	IntVector2D Dimension;
 	Image FractalPicture;
 	std::vector<atomwrapper<float>> ThreadsProgress;
 	std::vector<atomwrapper<bool>> ThreadsStatus;
 	int NumThreads;
 	int IterLimit;
-	int EscapeValue;
+	float EscapeValue;
 	float Brightness;
 	float Scaler;
-	Point2D Shifter;
+	FloatVector2D Shifter;
 	EMandelDrawMethod MandelDrawMethod;
 	std::clock_t StartTime;
 	std::clock_t DoneTime;

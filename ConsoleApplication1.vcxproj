@@ -146,7 +146,7 @@
     <ClInclude Include="CommonTools.h" />
     <ClInclude Include="MandelDrawer.h" />
     <ClInclude Include="Image.h" />
-    <ClInclude Include="Point2D.h" />
+    <ClInclude Include="Vector2D.h" />
     <ClInclude Include="Types.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
