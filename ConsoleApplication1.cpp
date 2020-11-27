@@ -27,7 +27,8 @@ int main()
 
 	M.PrintFinishInfo();
 
-	system("Image.bmp");
+	system("Image.bmp"); //открывает бмп
+	
 
 	std::cout << "Good bye";
 }
