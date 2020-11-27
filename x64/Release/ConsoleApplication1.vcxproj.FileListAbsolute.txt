@@ -1,1 +1,0 @@
-C:\MandelDrawer\x64\Release\ConsoleApplication1.exe
