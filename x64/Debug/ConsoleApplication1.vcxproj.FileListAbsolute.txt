@@ -1,0 +1,2 @@
+C:\MandelDrawer\x64\Debug\ConsoleApplication1.exe
+C:\MandelDrawer\x64\Debug\ConsoleApplication1.pdb

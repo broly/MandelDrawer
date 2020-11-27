@@ -1,0 +1,17 @@
+﻿  ConsoleApplication1.cpp
+C:\MandelDrawer\Image.h(34,13): warning C4244: инициализация: преобразование "uint64" в "int", возможна потеря данных
+C:\MandelDrawer\Image.h(41,13): warning C4244: инициализация: преобразование "uint64" в "int", возможна потеря данных
+C:\MandelDrawer\Image.h(72,11): warning C4244: инициализация: преобразование "float" в "int", возможна потеря данных
+C:\MandelDrawer\Image.h(73,11): warning C4244: инициализация: преобразование "float" в "int", возможна потеря данных
+C:\MandelDrawer\Image.h(74,11): warning C4244: инициализация: преобразование "float" в "int", возможна потеря данных
+C:\MandelDrawer\MandelDrawer.h(105,13): warning C4244: инициализация: преобразование "double" в "float", возможна потеря данных
+C:\MandelDrawer\MandelDrawer.h(106,13): warning C4244: инициализация: преобразование "double" в "float", возможна потеря данных
+C:\MandelDrawer\MandelDrawer.h(112,17): warning C4244: =: преобразование "int" в "float", возможна потеря данных
+C:\MandelDrawer\MandelDrawer.h(114,32): warning C4244: аргумент: преобразование "uint64" в "int", возможна потеря данных
+C:\MandelDrawer\MandelDrawer.h(114,29): warning C4244: аргумент: преобразование "uint64" в "int", возможна потеря данных
+C:\MandelDrawer\MandelDrawer.h(133,13): warning C4244: инициализация: преобразование "double" в "float", возможна потеря данных
+C:\MandelDrawer\MandelDrawer.h(134,13): warning C4244: инициализация: преобразование "double" в "float", возможна потеря данных
+C:\MandelDrawer\MandelDrawer.h(140,17): warning C4244: =: преобразование "int" в "float", возможна потеря данных
+C:\MandelDrawer\MandelDrawer.h(178,11): warning C4244: return: преобразование "int" в "float", возможна потеря данных
+C:\MandelDrawer\MandelDrawer.h(180,38): warning C4244: return: преобразование "double" в "float", возможна потеря данных
+  ConsoleApplication1.vcxproj -> C:\MandelDrawer\x64\Debug\ConsoleApplication1.exe
