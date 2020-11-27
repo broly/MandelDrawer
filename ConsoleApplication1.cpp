@@ -12,6 +12,7 @@
 #define BRIGHTNESS 1
 #define SCALE 2
 #define SHIFT {0.5, 0.5}
+#define IMAGE_PATH "Image.bmp"
 
 int main()
 {
@@ -26,7 +27,8 @@ int main()
 		BRIGHTNESS,
 		EMandelDrawMethod::ByPixelOrder,
 		SCALE,
-		SHIFT
+		SHIFT,
+		IMAGE_PATH
 	);
 
 	M.PrintStartupInfo();
@@ -35,7 +37,7 @@ int main()
 
 	M.PrintFinishInfo();
 
-	system("Image.bmp"); //открывает бмп
+	system(IMAGE_PATH); //открывает бмп
 	
 
 	std::cout << "Good bye";

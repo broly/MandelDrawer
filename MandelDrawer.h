@@ -25,7 +25,7 @@ enum class EMandelDrawMethod
 class MandelDrawer
 {
 public:
-	MandelDrawer(IntVector2D InDimension, int InNumThreads, int InIterLimit, float InEscapeValue, float InBrightness, EMandelDrawMethod InMandelDrawMethod, float Scale, FloatVector2D Offset)
+	MandelDrawer(IntVector2D InDimension, int InNumThreads, int InIterLimit, float InEscapeValue, float InBrightness, EMandelDrawMethod InMandelDrawMethod, float Scale, FloatVector2D Offset, const char* InSavePath)
 		: Dimension(InDimension)
 		, FractalPicture(Image(InDimension))
 		, NumThreads(InNumThreads)
@@ -35,6 +35,7 @@ public:
 		, MandelDrawMethod(InMandelDrawMethod)
 		, Scaler(Scale)
 		, Shifter(Offset)
+		, SavePath(InSavePath)
 	{}
 
 	void Start()
@@ -57,7 +58,7 @@ public:
 			std::cout << Progress * 100 << "%        ";
 		}
 		DoneTime = std::clock();
-		FractalPicture.SaveToFile("Image.bmp");
+		FractalPicture.SaveToFile(SavePath);
 	}
 
 	void StartThreads()
@@ -200,6 +201,7 @@ public:
 	float EscapeValue;
 	float Brightness;
 	float Scaler;
+	const char* SavePath;
 	FloatVector2D Shifter;
 	EMandelDrawMethod MandelDrawMethod;
 	std::clock_t StartTime;
