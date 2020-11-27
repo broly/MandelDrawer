@@ -11,8 +11,8 @@
 #define ESCAPE_VALUE 20
 #define BRIGHTNESS 1
 #define SCALE 0.5
-#define SHIFTX 1
-#define SHIFTY 1
+#define SHIFTX 0.5
+#define SHIFTY 0
 
 int main()
 {
@@ -26,6 +26,8 @@ int main()
 	M.Start();
 
 	M.PrintFinishInfo();
+
+	system("Image.bmp");
 
 	std::cout << "Good bye";
 }
