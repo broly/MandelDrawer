@@ -25,7 +25,7 @@ enum class EMandelDrawMethod
 class MandelDrawer
 {
 public:
-	MandelDrawer(IntVector2D InDimension, int InNumThreads, int InIterLimit, float InEscapeValue, float InBrightness, EMandelDrawMethod InMandelDrawMethod, float Scale, FloatVector2D Offset, const char* InSavePath)
+	MandelDrawer(IntVector2D InDimension, int InNumThreads, int InIterLimit, float InEscapeValue, float InBrightness, EMandelDrawMethod InMandelDrawMethod, float Scale, FloatVector2D Offset, const char* InSavePath, bool InSwitch)
 		: Dimension(InDimension)
 		, FractalPicture(Image(InDimension))
 		, NumThreads(InNumThreads)
@@ -36,6 +36,7 @@ public:
 		, Scaler(Scale)
 		, Shifter(Offset)
 		, SavePath(InSavePath)
+		, Switch(InSwitch)
 	{}
 
 	void Start()
@@ -180,8 +181,17 @@ public:
 		int n = 0;
 		while (IsEscaping(z) and n < IterLimit)
 		{
-			z = std::pow(z, -2) + c;
-			n += 1;
+			if (Switch)
+			{
+				z = std::pow(z, 2) + c;
+				n += 1;
+			}
+			else
+			{
+				std::complex<double> j(0.29679358717434834, 0.45713301603206424);
+				z = std::pow(z, 2) + j;
+				n += 1;
+			}
 		}
 
 		if (n == IterLimit)
@@ -202,6 +212,7 @@ public:
 	float Brightness;
 	float Scaler;
 	const char* SavePath;
+	bool Switch;
 	FloatVector2D Shifter;
 	EMandelDrawMethod MandelDrawMethod;
 	std::clock_t StartTime;

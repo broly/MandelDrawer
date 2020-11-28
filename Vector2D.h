@@ -59,7 +59,8 @@ struct TVector2D
 	}
 };
 
-using FloatVector2D = TVector2D<float>;
+using FloatVector2D = TVector2D<float>; 
+
 using IntVector2D = TVector2D<int>;
 
 template<typename T>

@@ -10,9 +10,10 @@
 #define ITERATION_LIMIT 50
 #define ESCAPE_VALUE 20
 #define BRIGHTNESS 1
-#define SCALE 2
-#define SHIFT {0.5, 0.5}
+#define SCALE 0.2
+#define SHIFT {0, 0}
 #define IMAGE_PATH "Image.bmp"
+#define SWITCH false
 
 int main()
 {
@@ -28,7 +29,8 @@ int main()
 		EMandelDrawMethod::ByPixelOrder,
 		SCALE,
 		SHIFT,
-		IMAGE_PATH
+		IMAGE_PATH,
+		SWITCH
 	);
 
 	M.PrintStartupInfo();
