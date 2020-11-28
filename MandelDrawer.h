@@ -25,7 +25,7 @@ enum class EMandelDrawMethod
 class MandelDrawer
 {
 public:
-	MandelDrawer(IntVector2D InDimension, int InNumThreads, int InIterLimit, float InEscapeValue, float InBrightness, EMandelDrawMethod InMandelDrawMethod, float Scale, FloatVector2D Offset, const char* InSavePath, bool InSwitch)
+	MandelDrawer(IntVector2D InDimension, int InNumThreads, int InIterLimit, float InEscapeValue, float InBrightness, EMandelDrawMethod InMandelDrawMethod, float Scale, FloatVector2D Offset, const char* InSavePath, bool InSwitch, FloatVector2D InJuliaValue)
 		: Dimension(InDimension)
 		, FractalPicture(Image(InDimension))
 		, NumThreads(InNumThreads)
@@ -36,7 +36,8 @@ public:
 		, Scaler(Scale)
 		, Shifter(Offset)
 		, SavePath(InSavePath)
-		, Switch(InSwitch)
+		, JuliaSwitch(InSwitch)
+		, JuliaValue(InJuliaValue)
 	{}
 
 	void Start()
@@ -181,14 +182,14 @@ public:
 		int n = 0;
 		while (IsEscaping(z) and n < IterLimit)
 		{
-			if (Switch)
+			if (JuliaSwitch)
 			{
 				z = std::pow(z, 2) + c;
 				n += 1;
 			}
 			else
 			{
-				std::complex<double> j(0.29679358717434834, 0.45713301603206424);
+				std::complex<double> j(JuliaValue.X, JuliaValue.Y);
 				z = std::pow(z, 2) + j;
 				n += 1;
 			}
@@ -212,7 +213,8 @@ public:
 	float Brightness;
 	float Scaler;
 	const char* SavePath;
-	bool Switch;
+	bool JuliaSwitch;
+	FloatVector2D JuliaValue;
 	FloatVector2D Shifter;
 	EMandelDrawMethod MandelDrawMethod;
 	std::clock_t StartTime;

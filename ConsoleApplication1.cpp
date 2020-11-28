@@ -13,7 +13,8 @@
 #define SCALE 0.2
 #define SHIFT {0, 0}
 #define IMAGE_PATH "Image.bmp"
-#define SWITCH false
+#define JULIASWITCH false
+#define JULIAVALUE {0.29679358717434834, 0.45713301603206424}
 
 int main()
 {
@@ -30,7 +31,8 @@ int main()
 		SCALE,
 		SHIFT,
 		IMAGE_PATH,
-		SWITCH
+		JULIASWITCH,
+		JULIAVALUE
 	);
 
 	M.PrintStartupInfo();
