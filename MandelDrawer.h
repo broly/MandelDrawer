@@ -184,13 +184,14 @@ public:
 		{
 			if (JuliaSwitch)
 			{
-				z = std::pow(z, 2) + c;
+				
+				std::complex<double> j(JuliaValue.X, JuliaValue.Y);
+				z = std::pow(z, 2) + j;
 				n += 1;
 			}
 			else
 			{
-				std::complex<double> j(JuliaValue.X, JuliaValue.Y);
-				z = std::pow(z, 2) + j;
+				z = std::pow(z, 2) + c;
 				n += 1;
 			}
 		}
