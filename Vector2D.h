@@ -3,6 +3,16 @@
 template<typename T>
 struct TVector2D
 {
+	TVector2D()
+		: X(T())
+		, Y(T())
+	{}
+	
+	TVector2D(T InX)
+		: X(InX)
+		, T(InX)
+	{}
+	
 	TVector2D(T InX, T InY)
 		: X(InX)
 		, Y(InY)
