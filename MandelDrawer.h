@@ -171,8 +171,7 @@ public:
 
 	float IsEscaping(std::complex<float> z) const
 	{
-		// same as "abs(z) <= EscapeValue", but little bit faster
-		return z.real() * z.imag() <= EscapeValue * EscapeValue;
+		return abs(z) <= EscapeValue;
 	}
 
 
