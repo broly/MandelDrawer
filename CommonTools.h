@@ -1,19 +1,13 @@
 #pragma once
+#include <algorithm>
 #include <Windows.h>
 
 #include <ctime> 
 
-void gotoxy(int xpos, int ypos)
-{
-	COORD scrn;
-
-	HANDLE hOuput = GetStdHandle(STD_OUTPUT_HANDLE);
-
-	scrn.X = xpos; scrn.Y = ypos;
-
-	SetConsoleCursorPosition(hOuput, scrn);
-}
-
+/**
+ * Stores the atomic with possibility to read and write
+ * It's needed to store atomic inside vectors (normal atomics could not be used inside containers)
+ */
 template <typename T>
 struct atomwrapper
 {
@@ -49,11 +43,26 @@ struct atomwrapper
 	}
 };
 
-char* AscTime()
+// Returns time as string
+std::string AscTime()
 {
 	time_t t; // t passed as argument in function time()
 	struct tm* tt; // decalring variable for localtime()
 	time(&t); //passing argument to time()
 	tt = localtime(&t);
 	return asctime(tt);
+}
+
+// Returns sum of all elements in vector
+template<typename T>
+float Sum(std::vector<T> v)
+{
+	return std::accumulate(v.begin(), v.end(), T());
+}
+
+// Returns true if all of elements are true, false else
+template<typename T>
+bool All(std::vector<T> v)
+{
+	return std::all_of(v.begin(), v.end(), [](bool v) { return v == true; });
 }
