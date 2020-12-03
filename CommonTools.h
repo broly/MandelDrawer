@@ -3,6 +3,7 @@
 
 #include <ctime> 
 
+// DEPRECATED. Reason: don't used anymore. Delete this core
 void gotoxy(int xpos, int ypos)
 {
 	COORD scrn;
@@ -14,6 +15,10 @@ void gotoxy(int xpos, int ypos)
 	SetConsoleCursorPosition(hOuput, scrn);
 }
 
+/**
+ * Stores the atomic with possibility to read and write
+ * It's needed to store atomic inside vectors (normal atomics could not be used inside containers)
+ */
 template <typename T>
 struct atomwrapper
 {
@@ -49,7 +54,8 @@ struct atomwrapper
 	}
 };
 
-char* AscTime()
+// Returns time as string
+std::string AscTime()
 {
 	time_t t; // t passed as argument in function time()
 	struct tm* tt; // decalring variable for localtime()
