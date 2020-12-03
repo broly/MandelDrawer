@@ -142,6 +142,7 @@
     <ClCompile Include="ConsoleApplication1.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Animation.h" />
     <ClInclude Include="Color.h" />
     <ClInclude Include="CommonTools.h" />
     <ClInclude Include="MandelDrawer.h" />

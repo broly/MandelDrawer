@@ -11,6 +11,7 @@
 #include <algorithm>
 #include <ctime>
 #include "Types.h"
+#include <sstream>
 
 enum class EMandelDrawMethod
 {
@@ -25,6 +26,7 @@ enum class EMandelDrawMethod
 class MandelDrawer
 {
 public:
+	MandelDrawer();
 	MandelDrawer(IntVector2D InDimension, int InNumThreads, int InIterLimit, float InEscapeValue, float InBrightness, EMandelDrawMethod InMandelDrawMethod, float Scale, FloatVector2D Offset, const char* InSavePath, bool InSwitch, FloatVector2D InJuliaValue)
 		: Dimension(InDimension)
 		, FractalPicture(Image(InDimension))

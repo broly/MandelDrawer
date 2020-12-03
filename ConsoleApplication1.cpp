@@ -1,9 +1,8 @@
 ﻿#define _CRT_SECURE_NO_WARNINGS
 #include <iostream>
 #include <complex>
-#include <vector>
-#include "MandelDrawer.h"
-
+//#include "MandelDrawer.h"
+//#include "Animation.h"
 
 #define DIM 3000
 #define THREADS_NUM 16
@@ -12,36 +11,54 @@
 #define BRIGHTNESS 1
 #define SCALE 0.2
 #define SHIFT {0, 0}
-#define IMAGE_PATH "Image.bmp"
 #define JULIASWITCH false
 #define JULIAVALUE {0.29679358717434834, 0.45713301603206424}
 
 int main()
 {
-	int width = DIM;
-	int height = DIM;
 
-	MandelDrawer M(
-		{ width, height },
-		THREADS_NUM,
-		ITERATION_LIMIT,
-		ESCAPE_VALUE,
-		BRIGHTNESS,
-		EMandelDrawMethod::ByPixelOrder,
-		SCALE,
-		SHIFT,
-		IMAGE_PATH,
-		JULIASWITCH,
-		JULIAVALUE
-	);
+	int index = 15;
+	int ind = 1;
+	while (ind < index)
+	{
+		char buffer[16];
 
-	M.PrintStartupInfo();
+		snprintf(buffer, 16, "image%02d.bmp", ind);
 
-	M.Start();
+		std::cout << buffer << std::endl;
+		//strcat(ImagePath, buffer);
+		//strcat(ImagePath, strEnd);
 
-	M.PrintFinishInfo();
+		ind++;
 
-	system(IMAGE_PATH); //открывает бмп
+	}
+	
+	
+	//	MandelDrawer M(
+	//		{ width, height },
+	//		THREADS_NUM,
+	//		ITERATION_LIMIT,
+	//		ESCAPE_VALUE,
+	//		BRIGHTNESS,
+	//		EMandelDrawMethod::ByPixelOrder,
+	//		SCALE,
+	//		SHIFT,
+	//		JULIASWITCH,
+	//		JULIAVALUE
+	//	);
+	//	M.PrintStartupInfo();
+	//	
+	//	M.Start();
+	//	
+	//	M.PrintFinishInfo();
+	//
+	//	
+	//
+	
+
+	
+
+	//system(); //открывает бмп
 	
 
 	std::cout << "Good bye";
