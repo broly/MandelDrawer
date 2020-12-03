@@ -1,19 +1,8 @@
 #pragma once
+#include <algorithm>
 #include <Windows.h>
 
 #include <ctime> 
-
-// DEPRECATED. Reason: don't used anymore. Delete this core
-void gotoxy(int xpos, int ypos)
-{
-	COORD scrn;
-
-	HANDLE hOuput = GetStdHandle(STD_OUTPUT_HANDLE);
-
-	scrn.X = xpos; scrn.Y = ypos;
-
-	SetConsoleCursorPosition(hOuput, scrn);
-}
 
 /**
  * Stores the atomic with possibility to read and write
@@ -62,4 +51,18 @@ std::string AscTime()
 	time(&t); //passing argument to time()
 	tt = localtime(&t);
 	return asctime(tt);
+}
+
+// Returns sum of all elements in vector
+template<typename T>
+float Sum(std::vector<T> v)
+{
+	return std::accumulate(v.begin(), v.end(), T());
+}
+
+// Returns true if all of elements are true, false else
+template<typename T>
+bool All(std::vector<T> v)
+{
+	return std::all_of(v.begin(), v.end(), [](bool v) { return v == true; });
 }

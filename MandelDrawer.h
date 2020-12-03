@@ -53,10 +53,10 @@ public:
 		while (!GeneralStatus)
 		{
 			// Compute average threads progress
-			const float Progress = std::accumulate(ThreadsProgress.begin(), ThreadsProgress.end(), 0.f) / (float)NumThreads;
+			const float Progress = Sum(ThreadsProgress) / (float)NumThreads;
 
 			// Are all threads complete?
-			GeneralStatus = std::all_of(ThreadsStatus.begin(), ThreadsStatus.end(), [](bool v) { return v == true; });
+			GeneralStatus = All(ThreadsStatus);
 
 			std::cout << Progress * 100 << "%        \r";
 		}
