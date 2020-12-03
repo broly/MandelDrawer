@@ -42,44 +42,56 @@ public:
 
 	void Start()
 	{
+		// Note the time
 		StartTime = std::clock();
-		StartThreads();
 
-		float Progress = 0.f;
+		// Start threads
+		StartThreads();
+		
 		bool GeneralStatus = false;
 
 		while (!GeneralStatus)
 		{
-			// ������� �������������� ���������� ���� �������
-			Progress = std::accumulate(ThreadsProgress.begin(), ThreadsProgress.end(), 0.f) / (float)NumThreads;
+			// Compute average threads progress
+			const float Progress = std::accumulate(ThreadsProgress.begin(), ThreadsProgress.end(), 0.f) / (float)NumThreads;
 
-			// ��� �� ������ ��������� ���� ������?
+			// Are all threads complete?
 			GeneralStatus = std::all_of(ThreadsStatus.begin(), ThreadsStatus.end(), [](bool v) { return v == true; });
 
-			gotoxy(0, 5);
-			std::cout << Progress * 100 << "%        ";
+			std::cout << Progress * 100 << "%        \r";
 		}
+		
+		// Note the finish time
 		DoneTime = std::clock();
+
+		// Save fractal image
 		FractalPicture.SaveToFile(SavePath);
 	}
 
 	void StartThreads()
 	{
-
+		// We must create some amount of threads here
 		for (int i = 0; i < NumThreads; i++)
 		{
+			// Create atomics to store progress and status
 			std::atomic<float> WorkerProgress{ 0.f };
 			std::atomic<bool> WorkerStatus{ false };
 
+			// Push this atomics into array for each thread
 			ThreadsProgress.push_back(WorkerProgress);
 			ThreadsStatus.push_back(WorkerStatus);
-			
+
+			// Create new thread here
 			std::thread mandel_worker([=]
 				{
-					ThreadsStatus[i] = false;
+					// Here is thread will start
 					StartThread(i);
+
+					// Send status about work is complete
 					ThreadsStatus[i] = true;
 				});
+			
+			// We must detach this thread from current (main) thread to make parallel compution
 			mandel_worker.detach();
 		}
 	}
@@ -98,27 +110,15 @@ public:
 
 	void Draw_ByChunk(int WorkerID)
 	{
-		int ChunkSizeX = Dimension.X / NumThreads;
-		IntVector2D ChunkPosition = { ChunkSizeX * WorkerID, 0 };
-		IntVector2D ChunkSize = { ChunkSizeX, Dimension.Y };
+		const int ChunkSizeX = Dimension.X / NumThreads;
+		const IntVector2D ChunkPosition = { ChunkSizeX * WorkerID, 0 };
+		const IntVector2D ChunkSize = { ChunkSizeX, Dimension.Y };
 		for (int x = ChunkPosition.X; x < ChunkPosition.X + ChunkSize.X; x++)
 		{
-			float percents = float(x) / ChunkSize.Y;
-
 			for (int y = ChunkPosition.Y; y < ChunkPosition.Y + ChunkSize.Y; y++)
-			{
-				float X = (x - (Dimension.X / 2.0f)) / (Dimension.X * Scaler) - Shifter.X;
-				float Y = (y - (Dimension.Y / 2.0f)) / (Dimension.Y * Scaler) - Shifter.Y;
-				std::complex<double> c(X, Y);
-				float m = mandelbrot(c);
+				DrawPixel(x, y);
 
-				Color color;
-				color.R = m / IterLimit;
-				color.G = m < IterLimit ? 0.f : 1.f;
-				color.B = 0;
-				FractalPicture.SetColor(x, y, color);
-			}
-
+			const float percents = float(x) / ChunkSize.Y;
 			ThreadsProgress[WorkerID] = percents;
 		}
 		ThreadsProgress[WorkerID] = 1.f;
@@ -126,31 +126,33 @@ public:
 
 	void Draw_ByPixelOrder(int WorkerID)
 	{
-		int StartX = WorkerID;
-		int StepX = NumThreads;
+		const int StartX = WorkerID;
+		const int StepX = NumThreads;
 
 		for (int x = StartX; x < Dimension.X; x += StepX)
 		{
-			float percents = float(x) / Dimension.Y;
-
 			for (int y = 0; y < Dimension.Y; y++)
-			{
-				const FloatVector2D Point_Screen = {x, y};
-				const FloatVector2D Point_Rel = (Point_Screen - Dimension/2.f) / (Dimension * Scaler) - Shifter;
-				
-				std::complex<double> c(Point_Rel.X, Point_Rel.Y);
-				float m = mandelbrot(c);
+				DrawPixel(x, y);
 
-				Color color;
-				color.R = m / IterLimit;
-				color.G = m < IterLimit ? 0.f : 1.f;
-				color.B = 0;
-				FractalPicture.SetColor(x, y, color);
-			}
-
+			const float percents = float(x) / Dimension.Y;
 			ThreadsProgress[WorkerID] = percents;
 		}
 		ThreadsProgress[WorkerID] = 1.f;
+	}
+
+	void DrawPixel(float x, float y)
+	{
+		const FloatVector2D Point_Screen = {x, y};
+		const FloatVector2D Point_Rel = (Point_Screen - Dimension/2.f) / (Dimension * Scaler) - Shifter;
+				
+		std::complex<double> c(Point_Rel.X, Point_Rel.Y);
+		float m = mandelbrot(c);
+
+		Color color;
+		color.R = m / IterLimit;
+		color.G = m < IterLimit ? 0.f : 1.f;
+		color.B = 0;
+		FractalPicture.SetColor(x, y, color);
 	}
 
 	void PrintStartupInfo()
