@@ -24,30 +24,36 @@ class Animation
 {	
 public:
 
-	Animation(float InFarmeRate, std::vector<AnimKeyFrame> InKeyFrames)
-		: FrameRate(InFarmeRate)
+	Animation(
+		float InFarmeRate,
+		std::vector<AnimKeyFrame> InKeyFrames,
+		float DefaultDrawScale = 0.25,
+		float DefaultIterLimit = 500,
+		float DefaultEscapeValue = 10.f,
+		IntVector2D DefaultResolution = {1000, 1000},
+		FloatVector2D DefaultOffset = {0.0f, 0.0f}
+	)
+		: Fractal(DefaultResolution, 16, DefaultIterLimit, DefaultEscapeValue, 1.f, EMandelDrawMethod::ByPixelOrder, DefaultDrawScale, DefaultOffset, "image.bmp", true, {0.f})
+		, FrameRate(InFarmeRate)
 		, KeyFrames(InKeyFrames)
 	{
 		auto predicate = [](AnimKeyFrame a, AnimKeyFrame b) {return a.Time < b.Time; };
 		std::sort(KeyFrames.begin(), KeyFrames.end(), predicate);
 		AnimationTime = KeyFrames[KeyFrames.size() - 1].Time;
 		FramesCount = FrameRate * AnimationTime;
-		Fractal.SetJuliaSwitch(true);
-		Fractal.Scaler = 0.25;
-		Fractal.IterLimit = 500;
 	}
 
 	void StartAnimation()
 	{
 		for (int i = 0; i < FramesCount; i++)
 		{
-			float CurrentFrameTime = (float)i / FrameRate; //ïðåäïîëîæèì òåêóùèé êàäð (CurrentFrameTime) ðàâåí 4
+			float CurrentFrameTime = (float)i / FrameRate; //Ð¿Ñ€ÐµÐ´Ð¿Ð¾Ð»Ð¾Ð¶Ð¸Ð¼ Ñ‚ÐµÐºÑƒÑ‰Ð¸Ð¹ ÐºÐ°Ð´Ñ€ (CurrentFrameTime) Ñ€Ð°Ð²ÐµÐ½ 4
 			for (int j = 0; j < KeyFrames.size() - 1; j++)
 			{
 				if (CurrentFrameTime >= KeyFrames[j].Time && CurrentFrameTime < KeyFrames[j + 1].Time)
 				{
-					AnimKeyFrame PrevKey = KeyFrames[j]; // ïðåäïîëîæèì ðàâåí 2
-					AnimKeyFrame NextKey = KeyFrames[j + 1]; // ïðåäïîëîæèì ðàâåí 6
+					AnimKeyFrame PrevKey = KeyFrames[j]; // Ð¿Ñ€ÐµÐ´Ð¿Ð¾Ð»Ð¾Ð¶Ð¸Ð¼ Ñ€Ð°Ð²ÐµÐ½ 2
+					AnimKeyFrame NextKey = KeyFrames[j + 1]; // Ð¿Ñ€ÐµÐ´Ð¿Ð¾Ð»Ð¾Ð¶Ð¸Ð¼ Ñ€Ð°Ð²ÐµÐ½ 6
 					float TimeBetweenKeyFrames = NextKey.Time - PrevKey.Time; // 6 - 2 = 4
 					float TimeBetweenPrevKeyAndCurrentFrame = CurrentFrameTime - PrevKey.Time; // 4 - 2 = 2
 					float Alpha = TimeBetweenPrevKeyAndCurrentFrame / TimeBetweenKeyFrames; // 2 / 4 = 0,5
@@ -57,7 +63,7 @@ public:
 
 					snprintf(buffer, 16, "image%02d.bmp", i);
 
-					Fractal.SavePath = buffer;
+					Fractal.SetSavePath(buffer);
 					Fractal.SetJuliaValue(CurrentValue);
 
 					Fractal.Start();
