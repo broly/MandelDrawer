@@ -52,12 +52,12 @@ public:
 			{
 				if (CurrentFrameTime >= KeyFrames[j].Time && CurrentFrameTime < KeyFrames[j + 1].Time)
 				{
-					AnimKeyFrame PrevKey = KeyFrames[j]; // предположим равен 2
-					AnimKeyFrame NextKey = KeyFrames[j + 1]; // предположим равен 6
-					float TimeBetweenKeyFrames = NextKey.Time - PrevKey.Time; // 6 - 2 = 4
-					float TimeBetweenPrevKeyAndCurrentFrame = CurrentFrameTime - PrevKey.Time; // 4 - 2 = 2
-					float Alpha = TimeBetweenPrevKeyAndCurrentFrame / TimeBetweenKeyFrames; // 2 / 4 = 0,5
-					FloatVector2D CurrentValue = Lerp(PrevKey.Value, NextKey.Value, Alpha);
+					const AnimKeyFrame PrevKey = KeyFrames[j]; // предположим равен 2
+					const AnimKeyFrame NextKey = KeyFrames[j + 1]; // предположим равен 6
+					const float TimeBetweenKeyFrames = NextKey.Time - PrevKey.Time; // 6 - 2 = 4
+					const float TimeBetweenPrevKeyAndCurrentFrame = CurrentFrameTime - PrevKey.Time; // 4 - 2 = 2
+					const float Alpha = TimeBetweenPrevKeyAndCurrentFrame / TimeBetweenKeyFrames; // 2 / 4 = 0,5
+					const FloatVector2D CurrentValue = Lerp(PrevKey.Value, NextKey.Value, Alpha);
 
 					char buffer[16];
 
