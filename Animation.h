@@ -37,31 +37,43 @@ public:
 		, FrameRate(InFarmeRate)
 		, KeyFrames(InKeyFrames)
 	{
+		// We must sort all KeyFrames before work with it
 		auto predicate = [](AnimKeyFrame a, AnimKeyFrame b) {return a.Time < b.Time; };
 		std::sort(KeyFrames.begin(), KeyFrames.end(), predicate);
-		AnimationTime = KeyFrames[KeyFrames.size() - 1].Time;
+
+		// Overall animation time is the next Key Frame time
+		const float AnimationTime = KeyFrames[KeyFrames.size() - 1].Time;
+		// To compute FramesCount we must multiply frame rate on animation time
 		FramesCount = (int)std::floor(FrameRate * AnimationTime);
 	}
 
 	void StartAnimation()
 	{
-		for (int i = 0; i < FramesCount; i++)
+		// We must enumerate all frames
+		for (int FrameIndex = 0; FrameIndex < FramesCount; FrameIndex++)   // FramesCount = 250
 		{
-			float CurrentFrameTime = (float)i / FrameRate; //предположим текущий кадр (CurrentFrameTime) равен 4
-			for (int j = 0; j < KeyFrames.size() - 1; j++)
+			// Current frame time is current frame index divided by frame rate; [FrameRate = 90fps, FrameIndex = 200]
+			const float CurrentFrameTime = (float)FrameIndex / FrameRate;  //    [180 / 90fps = 2.22 sec]
+			for (int KF_Index = 0; KF_Index < KeyFrames.size() - 1; KF_Index++)
 			{
-				if (CurrentFrameTime >= KeyFrames[j].Time && CurrentFrameTime < KeyFrames[j + 1].Time)
+				// If we are between two key frames we must compute this frame value
+				if (CurrentFrameTime >= KeyFrames[KF_Index].Time && CurrentFrameTime < KeyFrames[KF_Index + 1].Time)
 				{
-					const AnimKeyFrame PrevKey = KeyFrames[j]; // предположим равен 2
-					const AnimKeyFrame NextKey = KeyFrames[j + 1]; // предположим равен 6
-					const float TimeBetweenKeyFrames = NextKey.Time - PrevKey.Time; // 6 - 2 = 4
-					const float TimeBetweenPrevKeyAndCurrentFrame = CurrentFrameTime - PrevKey.Time; // 4 - 2 = 2
-					const float Alpha = TimeBetweenPrevKeyAndCurrentFrame / TimeBetweenKeyFrames; // 2 / 4 = 0,5
-					const FloatVector2D CurrentValue = Lerp(PrevKey.Value, NextKey.Value, Alpha);
+					// Grab info from array
+					const AnimKeyFrame& PrevKey = KeyFrames[KF_Index]; // [PrevKey.Time = 2]
+					const AnimKeyFrame& NextKey = KeyFrames[KF_Index + 1]; // [NextKey.Time = 6]
+					// Calculate time between key frames where current frame is placed
+					const float TimeBetweenKeyFrames = NextKey.Time - PrevKey.Time; // [6 - 2 = 4]
+					// Calculate time between previous key and current frame
+					const float TimeBetweenPrevKeyAndCurrentFrame = CurrentFrameTime - PrevKey.Time; // [4 - 2 = 2]
+					// Calculate alpha coefficient that will be used as interpolation value (its ratio between previous values)
+					const float Alpha = TimeBetweenPrevKeyAndCurrentFrame / TimeBetweenKeyFrames; // [2 / 4 = 0,5]
+					// Interpolation between key frame values
+					const FloatVector2D CurrentValue = Lerp(PrevKey.Value, NextKey.Value, Alpha);  // [lerp({1, 2}, {3, 0}, 0.5) = {2, 1}]
 
 					char buffer[16];
 
-					snprintf(buffer, 16, "image%02d.bmp", i);
+					snprintf(buffer, 16, "image%02d.bmp", FrameIndex);
 
 					Fractal.SetSavePath(buffer);
 					Fractal.SetJuliaValue(CurrentValue);
@@ -80,6 +92,5 @@ private:
 	MandelDrawer Fractal;
 	float FrameRate;
 	int FramesCount;
-	float AnimationTime;
 	std::vector<AnimKeyFrame> KeyFrames;
 };
