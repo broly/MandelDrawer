@@ -53,7 +53,7 @@ public:
 		for (int FrameIndex = 0; FrameIndex < FramesCount; FrameIndex++)   // FramesCount = 250
 		{
 			// Current frame time is current frame index divided by frame rate; [FrameRate = 90fps, FrameIndex = 200]
-			const float CurrentFrameTime = (float)FrameIndex / FrameRate;  //    [180 / 90fps = 2.22 sec]
+			const float CurrentFrameTime = (float)FrameIndex / FrameRate;  //    [200 / 90fps = 2.22 sec]
 			for (int KF_Index = 0; KF_Index < KeyFrames.size() - 1; KF_Index++)
 			{
 				// If we are between two key frames we must compute this frame value
