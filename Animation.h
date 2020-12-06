@@ -28,7 +28,7 @@ public:
 		float InFarmeRate,
 		std::vector<AnimKeyFrame> InKeyFrames,
 		float DefaultDrawScale = 0.25,
-		float DefaultIterLimit = 500,
+		int DefaultIterLimit = 500,
 		float DefaultEscapeValue = 10.f,
 		IntVector2D DefaultResolution = {1000, 1000},
 		FloatVector2D DefaultOffset = {0.0f, 0.0f}
@@ -40,7 +40,7 @@ public:
 		auto predicate = [](AnimKeyFrame a, AnimKeyFrame b) {return a.Time < b.Time; };
 		std::sort(KeyFrames.begin(), KeyFrames.end(), predicate);
 		AnimationTime = KeyFrames[KeyFrames.size() - 1].Time;
-		FramesCount = FrameRate * AnimationTime;
+		FramesCount = (int)std::floor(FrameRate * AnimationTime);
 	}
 
 	void StartAnimation()

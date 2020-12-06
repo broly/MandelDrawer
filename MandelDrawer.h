@@ -27,18 +27,18 @@ class MandelDrawer
 {
 public:
 	MandelDrawer()
-		: Resolution({1024, 1024})
+		  : Resolution({1024, 1024})
 		  , FractalPicture(Image(Resolution))
 		  , NumThreads(16)
 		  , IterLimit(150)
 		  , EscapeValue(8)
 		  , Brightness(1)
-		  , MandelDrawMethod(EMandelDrawMethod::ByPixelOrder)
 		  , DrawScale(1)
-		  , DrawOffset({0, 0})
 		  , SavePath("image.bmp")
 		  , bJuliaMode(false)
 		  , JuliaValue({0, 0})
+		  , DrawOffset({0, 0})
+		  , MandelDrawMethod(EMandelDrawMethod::ByPixelOrder)
 		  , StartTime(0)
 		  , FinishTime(0)
 	{
@@ -82,15 +82,15 @@ public:
 		// Start threads
 		StartWorkers();
 		
-		bool GeneralStatus = false;
-
-		while (!GeneralStatus)
+		bool Working = true;
+		
+		while (Working)
 		{
 			// Compute average threads progress
 			const float Progress = Sum(WorkersProgress) / (float)NumThreads;
 
 			// Are all threads complete?
-			GeneralStatus = All(WorkersStatus);
+			Working = !All(WorkersStatus);
 
 			std::cout << Progress * 100 << "%        \r";
 		}
@@ -192,7 +192,7 @@ public:
 		WorkersProgress[WorkerID] = 1.f;
 	}
 
-	void DrawPixel(float x, float y)
+	void DrawPixel(int x, int y)
 	{
 		const FloatVector2D Point_Screen = {x, y};
 		const FloatVector2D Point_Rel = (Point_Screen - Resolution/2.f) / (Resolution * DrawScale) - DrawOffset;
@@ -242,7 +242,7 @@ public:
 		if (n == IterLimit)
 			return (float)IterLimit;
 
-		return (n + 1 - log(log2(abs(z)))) * Brightness;
+		return (float)(n + 1 - log(log2(abs(z)))) * Brightness;
 
 	}
 
