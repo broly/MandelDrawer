@@ -27,8 +27,8 @@ class MandelDrawer
 {
 public:
 	MandelDrawer()
-		: Dimension({1024, 1024})
-		  , FractalPicture(Image(Dimension))
+		: Resolution({1024, 1024})
+		  , FractalPicture(Image(Resolution))
 		  , NumThreads(16)
 		  , IterLimit(150)
 		  , EscapeValue(8)
@@ -45,7 +45,7 @@ public:
 	}
 
 	MandelDrawer(
-		IntVector2D InDimension = {1024, 1024},
+		IntVector2D InResolution = {1024, 1024},
 		int InNumThreads = 16,
 		int InIterLimit = 150,
 		float InEscapeValue = 8.0,
@@ -57,8 +57,8 @@ public:
 		bool InJuliaMode = false,
 		FloatVector2D InJuliaValue = {0.f}
 	)
-		: Dimension(InDimension)
-		  , FractalPicture(Image(InDimension))
+		  : Resolution(InResolution)
+		  , FractalPicture(Image(InResolution))
 		  , NumThreads(InNumThreads)
 		  , IterLimit(InIterLimit)
 		  , EscapeValue(InEscapeValue)
@@ -162,9 +162,9 @@ public:
 
 	void Draw_ByChunk(int WorkerID)
 	{
-		const int ChunkSizeX = Dimension.X / NumThreads;
+		const int ChunkSizeX = Resolution.X / NumThreads;
 		const IntVector2D ChunkPosition = { ChunkSizeX * WorkerID, 0 };
-		const IntVector2D ChunkSize = { ChunkSizeX, Dimension.Y };
+		const IntVector2D ChunkSize = { ChunkSizeX, Resolution.Y };
 		for (int x = ChunkPosition.X; x < ChunkPosition.X + ChunkSize.X; x++)
 		{
 			for (int y = ChunkPosition.Y; y < ChunkPosition.Y + ChunkSize.Y; y++)
@@ -181,12 +181,12 @@ public:
 		const int StartX = WorkerID;
 		const int StepX = NumThreads;
 
-		for (int x = StartX; x < Dimension.X; x += StepX)
+		for (int x = StartX; x < Resolution.X; x += StepX)
 		{
-			for (int y = 0; y < Dimension.Y; y++)
+			for (int y = 0; y < Resolution.Y; y++)
 				DrawPixel(x, y);
 
-			const float percents = float(x) / Dimension.Y;
+			const float percents = float(x) / Resolution.Y;
 			WorkersProgress[WorkerID] = percents;
 		}
 		WorkersProgress[WorkerID] = 1.f;
@@ -195,7 +195,7 @@ public:
 	void DrawPixel(float x, float y)
 	{
 		const FloatVector2D Point_Screen = {x, y};
-		const FloatVector2D Point_Rel = (Point_Screen - Dimension/2.f) / (Dimension * DrawScale) - DrawOffset;
+		const FloatVector2D Point_Rel = (Point_Screen - Resolution/2.f) / (Resolution * DrawScale) - DrawOffset;
 				
 		std::complex<double> c(Point_Rel.X, Point_Rel.Y);
 		float m = Fractal(c);
@@ -209,7 +209,7 @@ public:
 
 	void PrintStartupInfo()
 	{
-		std::cout << "Dimension: " << Dimension << std::endl;
+		std::cout << "Dimension: " << Resolution << std::endl;
 		std::cout << "Threads num: " << NumThreads << std::endl;
 		std::cout << "Draw method: " << (int)MandelDrawMethod << std::endl;
 		std::cout << "Iter limit: " << IterLimit << std::endl;
@@ -247,7 +247,7 @@ public:
 	}
 
 private:
-	IntVector2D Dimension;
+	IntVector2D Resolution;
 	Image FractalPicture;
 	std::vector<atomwrapper<float>> WorkersProgress;
 	std::vector<atomwrapper<bool>> WorkersStatus;
