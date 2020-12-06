@@ -26,7 +26,21 @@ enum class EMandelDrawMethod
 class MandelDrawer
 {
 public:
-	MandelDrawer();
+	MandelDrawer()
+		: Dimension({ 2000, 2000 })
+		, FractalPicture(Image(Dimension))
+		, NumThreads(12)
+		, IterLimit(15)
+		, EscapeValue(8)
+		, Brightness(1)
+		, MandelDrawMethod(EMandelDrawMethod::ByPixelOrder)
+		, Scaler(1)
+		, Shifter({ 0, 0 })
+		, SavePath("image.bmp")
+		, JuliaSwitch(false)
+		, JuliaValue({0, 0})
+	{}
+
 	MandelDrawer(IntVector2D InDimension, int InNumThreads, int InIterLimit, float InEscapeValue, float InBrightness, EMandelDrawMethod InMandelDrawMethod, float Scale, FloatVector2D Offset, const char* InSavePath, bool InSwitch, FloatVector2D InJuliaValue)
 		: Dimension(InDimension)
 		, FractalPicture(Image(InDimension))
@@ -70,8 +84,21 @@ public:
 		FractalPicture.SaveToFile(SavePath);
 	}
 
+	void SetJuliaSwitch(bool BValue)
+	{
+		JuliaSwitch = BValue;
+	}
+
+	void SetJuliaValue(FloatVector2D Value)
+	{
+		JuliaValue = Value;
+	} 
+
 	void StartThreads()
 	{
+		ThreadsProgress.clear();
+		ThreadsStatus.clear();
+
 		// We must create some amount of threads here
 		for (int i = 0; i < NumThreads; i++)
 		{
@@ -189,7 +216,7 @@ public:
 			{
 				
 				std::complex<double> j(JuliaValue.X, JuliaValue.Y);
-				z = std::pow(z, 2) + j;
+				z = std::pow(z, -2) + j;
 				n += 1;
 			}
 			else

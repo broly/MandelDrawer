@@ -10,7 +10,7 @@ struct TVector2D
 	
 	TVector2D(T InX)
 		: X(InX)
-		, T(InX)
+		, Y(InX)
 	{}
 	
 	TVector2D(T InX, T InY)

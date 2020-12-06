@@ -1,94 +1,79 @@
 #pragma once
 #define _CRT_SECURE_NO_WARNINGS
 #include "MandelDrawer.h"
+#include <algorithm>
 
-#define DIM 3000
-#define THREADS_NUM 16
-#define ITERATION_LIMIT 50
-#define ESCAPE_VALUE 20
-#define BRIGHTNESS 1
-#define SCALE 0.2
-#define SHIFT {0, 0}
+//char buffer[16];
+//
+//snprintf(buffer, 16, "image%02d.bmp", ind);
+//
+//Fractal.SavePath = buffer;
+//Fractal.JuliaValue = Julia;
+//
+//Fractal.Start();
+
+struct AnimKeyFrame
+{
+	float Time;
+	FloatVector2D Value;
+};
+
+
 
 class Animation
-{
-	
+{	
 public:
-	
-	Animation()
-	{
-		width = DIM;
-		height = DIM;
-		Index = 1;
-		JuliaSwitch = false;
-		JuliaValue = { 0.2, 0.35 };
 
+	Animation(float InFarmeRate, std::vector<AnimKeyFrame> InKeyFrames)
+		: FrameRate(InFarmeRate)
+		, KeyFrames(InKeyFrames)
+	{
+		auto predicate = [](AnimKeyFrame a, AnimKeyFrame b) {return a.Time < b.Time; };
+		std::sort(KeyFrames.begin(), KeyFrames.end(), predicate);
+		AnimationTime = KeyFrames[KeyFrames.size() - 1].Time;
+		FramesCount = FrameRate * AnimationTime;
+		Fractal.SetJuliaSwitch(true);
+		Fractal.Scaler = 0.25;
+		Fractal.IterLimit = 500;
 	}
 
-	
-
-	void SetValues()
+	void StartAnimation()
 	{
-		std::cout << "Fractal 0 - Mandelbrot, 1 - Julia" << std::endl;
-		std::cin >> JuliaSwitch;
-		std::cout << "zadayte dva znachenia mnogestva julia ot 0 do 1" << std::endl;
-		std::cin >> JuliaValue.X >> JuliaValue.Y;
-		std::cout << "vvedite kollichestvo kedrov" << std::endl;
-		std::cin >> Index;
-	}
-
-	char nameindex(int index)
-	{
-		int ind = 1;
-		while (ind < index)
+		for (int i = 0; i < FramesCount; i++)
 		{
-			char buffer[12];
-			char ImagePath[8] = "image";
-			char strEnd[5] = ".bmp";
+			float CurrentFrameTime = (float)i / FrameRate; //предположим текущий кадр (CurrentFrameTime) равен 4
+			for (int j = 0; j < KeyFrames.size() - 1; j++)
+			{
+				if (CurrentFrameTime >= KeyFrames[j].Time && CurrentFrameTime < KeyFrames[j + 1].Time)
+				{
+					AnimKeyFrame PrevKey = KeyFrames[j]; // предположим равен 2
+					AnimKeyFrame NextKey = KeyFrames[j + 1]; // предположим равен 6
+					float TimeBetweenKeyFrames = NextKey.Time - PrevKey.Time; // 6 - 2 = 4
+					float TimeBetweenPrevKeyAndCurrentFrame = CurrentFrameTime - PrevKey.Time; // 4 - 2 = 2
+					float Alpha = TimeBetweenPrevKeyAndCurrentFrame / TimeBetweenKeyFrames; // 2 / 4 = 0,5
+					FloatVector2D CurrentValue = Lerp(PrevKey.Value, NextKey.Value, Alpha);
 
-			snprintf(buffer, 12, "image%d", ind);
+					char buffer[16];
 
-			strcat(ImagePath, buffer);
-			strcat(ImagePath, strEnd);
+					snprintf(buffer, 16, "image%02d.bmp", i);
 
-			ind++;
+					Fractal.SavePath = buffer;
+					Fractal.SetJuliaValue(CurrentValue);
+
+					Fractal.Start();
+
+					break;
+				}
+			}
+			
 		}
-	}
-
-	void DrawAnimation()
-	{
-		Fractal(
-			{ width, height },
-			THREADS_NUM,
-			ITERATION_LIMIT,
-			ESCAPE_VALUE,
-			BRIGHTNESS,
-			EMandelDrawMethod::ByPixelOrder,
-			SCALE,
-			SHIFT,
-			PathName,
-			JuliaSwitch,
-			JuliaValue
-		);
-		Fractal.PrintStartupInfo();
-
-		Fractal.Start();
-
-		Fractal.PrintFinishInfo();
 	}
 
 private:
 
 	MandelDrawer Fractal;
-	int width;
-	int height;
-	int Index;
-	char PathName[11];
-	bool JuliaSwitch;
-	FloatVector2D JuliaValue;
-	
-	
-
-		
-	
+	float FrameRate;
+	int FramesCount;
+	float AnimationTime;
+	std::vector<AnimKeyFrame> KeyFrames;
 };

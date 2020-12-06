@@ -66,3 +66,9 @@ bool All(std::vector<T> v)
 {
 	return std::all_of(v.begin(), v.end(), [](bool v) { return v == true; });
 }
+
+template<typename T>
+T Lerp(T a, T b, float alpha)
+{
+	return a + (b - a) * alpha;
+}
