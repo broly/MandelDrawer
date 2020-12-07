@@ -27,7 +27,7 @@ class MandelDrawer
 {
 public:
 	MandelDrawer()
-		: Dimension({ 2000, 2000 })
+		: Dimension({ 1000, 1000 })
 		, FractalPicture(Image(Dimension))
 		, NumThreads(12)
 		, IterLimit(15)
@@ -216,7 +216,7 @@ public:
 			{
 				
 				std::complex<double> j(JuliaValue.X, JuliaValue.Y);
-				z = std::pow(z, -2) + j;
+				z = std::sin(z) + std::cosh(z) + j;
 				n += 1;
 			}
 			else

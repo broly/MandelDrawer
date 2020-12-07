@@ -33,8 +33,8 @@ public:
 		AnimationTime = KeyFrames[KeyFrames.size() - 1].Time;
 		FramesCount = FrameRate * AnimationTime;
 		Fractal.SetJuliaSwitch(true);
-		Fractal.Scaler = 0.25;
-		Fractal.IterLimit = 500;
+		Fractal.Scaler = 0.1;
+		Fractal.IterLimit = 200;
 	}
 
 	void StartAnimation()
