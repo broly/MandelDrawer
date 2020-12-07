@@ -28,23 +28,31 @@ public:
 		float InFarmeRate,
 		std::vector<AnimKeyFrame> InKeyFrames,
 		float DefaultDrawScale = 0.25,
-		int DefaultIterLimit = 500,
+		int DefaultIterLimit = 150,
 		float DefaultEscapeValue = 10.f,
 		IntVector2D DefaultResolution = {1000, 1000},
-		FloatVector2D DefaultOffset = {0.0f, 0.0f}
+		FloatVector2D DefaultOffset = {0.0f, 0.0f},
+		float DefaultBrightness = 1.f
 	)
-		: Fractal(DefaultResolution, 16, DefaultIterLimit, DefaultEscapeValue, 1.f, EMandelDrawMethod::ByPixelOrder, DefaultDrawScale, DefaultOffset, "image.bmp", true, {0.f})
+		: Fractal(DefaultResolution, 50, DefaultIterLimit, DefaultEscapeValue, DefaultBrightness, EMandelDrawMethod::MultiThreaded_ByPixelOrder, DefaultDrawScale, DefaultOffset, "image.bmp", true, {0.f})
 		, FrameRate(InFarmeRate)
 		, KeyFrames(InKeyFrames)
 	{
 		// We must sort all KeyFrames before work with it
-		auto predicate = [](AnimKeyFrame a, AnimKeyFrame b) {return a.Time < b.Time; };
+		auto predicate = [](const AnimKeyFrame& a, const AnimKeyFrame& b) { return a.Time < b.Time; };
 		std::sort(KeyFrames.begin(), KeyFrames.end(), predicate);
 
 		// Overall animation time is the next Key Frame time
 		const float AnimationTime = KeyFrames[KeyFrames.size() - 1].Time;
 		// To compute FramesCount we must multiply frame rate on animation time
 		FramesCount = (int)std::floor(FrameRate * AnimationTime);
+		
+		Fractal.Bind_OnProgressChanged(std::bind(&Animation::ProgressChanged, this, std::placeholders::_1));
+	}
+
+	void ProgressChanged(float Progress)
+	{
+		std::cout << Progress * 100 << "%        \r";
 	}
 
 	void StartAnimation()
@@ -73,7 +81,7 @@ public:
 
 					char buffer[16];
 
-					snprintf(buffer, 16, "image%02d.bmp", FrameIndex);
+					snprintf(buffer, 16, "image%04d.bmp", FrameIndex);
 
 					Fractal.SetSavePath(buffer);
 					Fractal.SetJuliaValue(CurrentValue);
