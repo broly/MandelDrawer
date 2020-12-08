@@ -4,12 +4,15 @@
 #include "MandelDrawer.h"
 #include "Animation.h"
 
-FILE _iob[] = { *stdin, *stdout, *stderr };
 
+/// This construction is needed to avoid libjpeg bug
+FILE _iob[] = { *stdin, *stdout, *stderr };
 extern "C" FILE * __cdecl __iob_func(void)
 {
 	return _iob;
 }
+/// Probably need to build libjpeg manually for x64
+
 
 int main()
 {
