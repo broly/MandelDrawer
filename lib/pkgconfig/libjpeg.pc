@@ -1,10 +1,10 @@
-prefix=/c/tmp/LibJpegBuild
-exec_prefix=${prefix}
-libdir=${exec_prefix}/lib
-includedir=${prefix}/include
+prefix=c:/libjpeg-turbo-gcc64
+exec_prefix=c:/libjpeg-turbo-gcc64
+libdir=c:/libjpeg-turbo-gcc64/lib
+includedir=c:/libjpeg-turbo-gcc64/include
 
 Name: libjpeg
-Description: Reads and writes JPEG files
-Version: 9.4.0
+Description: A SIMD-accelerated JPEG codec that provides the libjpeg API
+Version: 2.0.90
 Libs: -L${libdir} -ljpeg
 Cflags: -I${includedir}

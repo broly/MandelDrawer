@@ -3,8 +3,8 @@
 #include "Color.h"
 #include "Vector2D.h"
 #include "Types.h"
-#include <jpeglib.h>
 
+#include <jpeglib.h>
 
 const int BYTES_PER_PIXEL = 3;
 
@@ -143,7 +143,7 @@ struct Image
 		/* Now do the compression .. */
 		jpeg_start_compress(&cinfo, TRUE);
 
-		JSAMPROW buffer = new char[Dimension.X];
+		JSAMPROW buffer = new unsigned char[Dimension.X];
 		for (int i = 0; i < Size; i += Dimension.X)
 		{
 			memcpy(buffer,
