@@ -3,6 +3,8 @@
 #include "Color.h"
 #include "Vector2D.h"
 #include "Types.h"
+#include <jpeglib.h>
+
 
 const int BYTES_PER_PIXEL = 3;
 
@@ -118,5 +120,39 @@ struct Image
 		free(img);
 		fclose(f);
 
+	}
+	void SaveToFileJ(std::string name)
+	{
+		struct jpeg_compress_struct cinfo;
+		struct jpeg_error_mgr jerr;
+
+		/* this is a pointer to one row of image data */
+		FILE* outfile = fopen(name.c_str(), "wb");
+
+		cinfo.err = jpeg_std_error(&jerr);
+		jpeg_create_compress(&cinfo);
+		jpeg_stdio_dest(&cinfo, outfile);
+
+		/* Setting the parameters of the output file here */
+		cinfo.image_width = Dimension.X;//width;
+		cinfo.image_height = Dimension.Y;//height;
+		cinfo.input_components = 3;
+		cinfo.in_color_space = JCS_RGB;
+
+		jpeg_set_defaults(&cinfo);
+		/* Now do the compression .. */
+		jpeg_start_compress(&cinfo, TRUE);
+
+		JSAMPROW buffer = new char[Dimension.X];
+		for (int i = 0; i < Size; i += Dimension.X)
+		{
+			memcpy(buffer,
+				(JSAMPROW)Data + i,
+				Dimension.X);//segmentation fault here
+			jpeg_write_scanlines(&cinfo, &buffer, 1);
+		}
+		jpeg_finish_compress(&cinfo);
+		jpeg_destroy_compress(&cinfo);
+		fclose(outfile);
 	}
 };
