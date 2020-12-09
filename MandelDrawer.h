@@ -248,10 +248,11 @@ public:
 		std::complex<double> c(Point_Rel.X, Point_Rel.Y);
 		float m = Fractal(c);
 
-		Color color;
-		color.R = m / IterLimit;
-		color.G = m < IterLimit ? 0.f : 1.f;
-		color.B = 0;
+		Color color = LinearColor {
+			m < IterLimit ? 0.f : 1.f,
+			0.f,
+			m / IterLimit,
+		};
 		FractalPicture.SetColor(x, y, color);
 	}
 
