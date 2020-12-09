@@ -45,7 +45,7 @@ public:
 		  , EscapeValue(8)
 		  , Brightness(1)
 		  , DrawScale(1)
-		  , SavePath("image.jpeg")
+		  , SavePath("image.bmp")
 		  , bJuliaMode(false)
 		  , JuliaValue({0, 0})
 		  , DrawOffset({0, 0})
@@ -64,7 +64,7 @@ public:
 		EMandelDrawMethod InMandelDrawMethod = EMandelDrawMethod::MultiThreaded_ByPixelOrder,
 		float InScale = 1.f,
 		FloatVector2D InOffset = {0.f, 0.f},
-		const char* InSavePath = "image.jpeg",
+		const char* InSavePath = "image.bmp",
 		bool InJuliaMode = false,
 		FloatVector2D InJuliaValue = {0.f}
 	)
@@ -248,11 +248,19 @@ public:
 		std::complex<double> c(Point_Rel.X, Point_Rel.Y);
 		float m = Fractal(c);
 
+		// TODO: Example with HSV
+		// Color color = LinearColor {
+		// 	((m / IterLimit) * 480) + 45,
+		// 	0.7f,
+		// 	((m / (float)IterLimit) == 0) ? (m / IterLimit * 6) : 1,
+		// }.HSV2RGB() ^ 2;
+
 		Color color = LinearColor {
 			m < IterLimit ? 0.f : 1.f,
-			0.f,
-			m / IterLimit,
-		};
+            0.f,
+            m / IterLimit,
+        };
+
 		FractalPicture.SetColor(x, y, color);
 	}
 
