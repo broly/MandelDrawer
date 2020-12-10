@@ -102,6 +102,58 @@ struct Image
 	}
 	void SaveToFileJ(std::string filename)
 	{
-		  // TODO: Hueplet to be - Hueptlet to live (c)
+		struct jpeg_compress_struct cinfo;
+		
+		struct jpeg_error_mgr jerr;
+		/* More stuff */
+		FILE* outfile;		/* target file */
+		JSAMPROW row_pointer[1];	/* pointer to JSAMPLE row[s] */
+		int row_stride;		/* physical row width in image buffer */
+
+		
+		cinfo.err = jpeg_std_error(&jerr);
+		/* Now we can initialize the JPEG compression object. */
+		jpeg_create_compress(&cinfo);
+
+		
+		if ((outfile = fopen(filename.c_str(), "wb")) == NULL) {
+			fprintf(stderr, "can't open %s\n", filename);
+			exit(1);
+		}
+		jpeg_stdio_dest(&cinfo, outfile);
+
+		
+		cinfo.image_width = Dimension.X; 	/* image width and height, in pixels */
+		cinfo.image_height = Dimension.Y;
+		cinfo.input_components = 3;		/* # of color components per pixel */
+		cinfo.in_color_space = JCS_RGB; 	/* colorspace of input image */
+		
+		jpeg_set_defaults(&cinfo);
+		
+		jpeg_set_quality(&cinfo, 90, TRUE /* limit to baseline-JPEG values */);
+
+		
+		jpeg_start_compress(&cinfo, TRUE);
+
+		
+		row_stride = Dimension.X * 3;	/* JSAMPLEs per row in image_buffer */
+
+		while (cinfo.next_scanline < cinfo.image_height) {
+			
+			row_pointer[0] = &((unsigned char*)Data)[cinfo.next_scanline * row_stride];
+			(void)jpeg_write_scanlines(&cinfo, row_pointer, 1);
+		}
+
+
+		jpeg_finish_compress(&cinfo);
+		/* After finish_compress, we can close the output file. */
+		fclose(outfile);
+
+		/* Step 7: release JPEG compression object */
+
+		/* This is an important step since it will release a good deal of memory. */
+		jpeg_destroy_compress(&cinfo);
+
+		/* And we're done! */
 	}
 };

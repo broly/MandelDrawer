@@ -36,6 +36,7 @@ int main()
 		}, 0.33f, 250, 25, {1000, 1000}, {0.f}, 5.f);
 
 	One.StartAnimation();
+	
 
 	
 	//system(); //открывает бмп
