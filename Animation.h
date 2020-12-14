@@ -34,7 +34,7 @@ public:
 		FloatVector2D DefaultOffset = {0.0f, 0.0f},
 		float DefaultBrightness = 1.f
 	)
-		: Fractal(DefaultResolution, 16, DefaultIterLimit, DefaultEscapeValue, DefaultBrightness, EMandelDrawMethod::MultiThreaded_ByPixelOrder, DefaultDrawScale, DefaultOffset, "image.bmp", true, {0.f})
+		: Fractal(DefaultResolution, 12, DefaultIterLimit, DefaultEscapeValue, DefaultBrightness, EMandelDrawMethod::MultiThreaded_ByPixelOrder, DefaultDrawScale, DefaultOffset, "image.bmp", false, {0.f})
 		, FrameRate(InFarmeRate)
 		, KeyFrames(InKeyFrames)
 	{

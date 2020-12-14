@@ -123,6 +123,8 @@ struct Image
 		jpeg_stdio_dest(&cinfo, outfile);
 
 		
+
+
 		cinfo.image_width = Dimension.X; 	/* image width and height, in pixels */
 		cinfo.image_height = Dimension.Y;
 		cinfo.input_components = 3;		/* # of color components per pixel */
@@ -138,13 +140,21 @@ struct Image
 		
 		row_stride = Dimension.X * 3;	/* JSAMPLEs per row in image_buffer */
 
-		while (cinfo.next_scanline < cinfo.image_height) {
-			
-			row_pointer[0] = &((unsigned char*)Data)[cinfo.next_scanline * row_stride];
-			(void)jpeg_write_scanlines(&cinfo, row_pointer, 1);
+		Color* DataRecolor = new Color[Size];
+
+		for (uint64 i = 0; i < Size; i++)
+		{
+			DataRecolor[i] = Data[i].BGR();
 		}
+	
+		while (cinfo.next_scanline < cinfo.image_height) {
 
+			row_pointer[0] = (unsigned char*)DataRecolor + cinfo.next_scanline * row_stride;
+			jpeg_write_scanlines(&cinfo, row_pointer, 1);
 
+		}
+		delete[] DataRecolor;
+		
 		jpeg_finish_compress(&cinfo);
 		/* After finish_compress, we can close the output file. */
 		fclose(outfile);
