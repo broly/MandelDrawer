@@ -55,14 +55,14 @@ std::string AscTime()
 
 // Returns sum of all elements in vector
 template<typename T>
-float Sum(std::vector<T> v)
+float Sum(const std::vector<T>& v)
 {
 	return std::accumulate(v.begin(), v.end(), T());
 }
 
 // Returns true if all of elements are true, false else
 template<typename T>
-bool All(std::vector<T> v)
+bool All(const std::vector<T>& v)
 {
 	return std::all_of(v.begin(), v.end(), [](bool v) { return v == true; });
 }
