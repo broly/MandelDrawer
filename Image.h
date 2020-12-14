@@ -3,6 +3,8 @@
 #include "Color.h"
 #include "Vector2D.h"
 #include "Types.h"
+#include <sys/stat.h>
+#include <direct.h>
 
 #include <jpeglib.h>
 
@@ -52,8 +54,24 @@ struct Image
 		return result;
 	}
 
+	static void CreateOutputDirectoryIfNotExists()
+	{
+		struct stat info;
+
+		const char* OutputDirectory = "Output";
+		
+		stat(OutputDirectory, &info);
+
+		if (!(info.st_mode & S_IFDIR))
+		{
+			_mkdir(OutputDirectory);
+		}
+	}
+
 	void SaveToFile(std::string Filename)
 	{
+		CreateOutputDirectoryIfNotExists();
+		
 		int Width = Dimension.X;
 		int Height = Dimension.Y;
 
@@ -100,8 +118,13 @@ struct Image
 		fclose(f);
 
 	}
+
+	
+	
 	void SaveToFileJ(std::string filename)
 	{
+		CreateOutputDirectoryIfNotExists();
+		
 		struct jpeg_compress_struct cinfo;
 		
 		struct jpeg_error_mgr jerr;
