@@ -79,9 +79,9 @@ public:
 					// Interpolation between key frame values
 					const FloatVector2D CurrentValue = Lerp(PrevKey.Value, NextKey.Value, Alpha);  // [lerp({1, 2}, {3, 0}, 0.5) = {2, 1}]
 
-					char buffer[16];
+					char buffer[255];
 
-					snprintf(buffer, 16, "image%04d.bmp", FrameIndex);
+					snprintf(buffer, 255, "Output/image%04d.bmp", FrameIndex);
 
 					Fractal.SetSavePath(buffer);
 					Fractal.SetJuliaValue(CurrentValue);

@@ -45,7 +45,7 @@ public:
 		  , EscapeValue(8)
 		  , Brightness(1)
 		  , DrawScale(1)
-		  , SavePath("image.bmp")
+		  , SavePath("Output/image.bmp")
 		  , bJuliaMode(false)
 		  , JuliaValue({0, 0})
 		  , DrawOffset({0, 0})
@@ -64,7 +64,7 @@ public:
 		EMandelDrawMethod InMandelDrawMethod = EMandelDrawMethod::MultiThreaded_ByPixelOrder,
 		float InScale = 1.f,
 		FloatVector2D InOffset = {0.f, 0.f},
-		const char* InSavePath = "image.bmp",
+		const char* InSavePath = "Output/image.bmp",
 		bool InJuliaMode = false,
 		FloatVector2D InJuliaValue = {0.f}
 	)
