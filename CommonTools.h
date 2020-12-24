@@ -35,6 +35,11 @@ struct atomwrapper
 		return _a.load();
 	}
 
+	operator T() const
+	{
+		return _a.load();
+	}
+
 	atomwrapper& operator=(T v)
 	{
 		_a.store(v);

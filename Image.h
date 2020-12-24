@@ -140,7 +140,7 @@ struct Image
 
 		
 		if ((outfile = fopen(filename.c_str(), "wb")) == NULL) {
-			fprintf(stderr, "can't open %s\n", filename);
+			fprintf(stderr, "can't open %s\n", filename.c_str());
 			exit(1);
 		}
 		jpeg_stdio_dest(&cinfo, outfile);

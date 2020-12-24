@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30717.126
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ConsoleApplication1", "ConsoleApplication1.vcxproj", "{2CC8A351-8F97-48CD-B55F-0F692BB8D066}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MandelDrawer", "MandelDrawer.vcxproj", "{2CC8A351-8F97-48CD-B55F-0F692BB8D066}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

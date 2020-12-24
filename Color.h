@@ -225,7 +225,7 @@ inline LinearColor LinearColor::RGB2HSV() const
 	if (delta == 0.f)
 		H = 0;
 	else if (c_max == R)
-		H = 60 * fmod((G - B) / delta, 6);
+		H = 60 * fmodf((G - B) / delta, 6);
 	else if (c_max == G)
 		H = 60 * ((B - R) / delta) + 2;
 	else if (c_max == B)
@@ -243,7 +243,7 @@ inline LinearColor LinearColor::HSV2RGB() const
 	const float H = R, S = G, V = B;
 
 	const float C = V * S;
-	const float X = C * (1 - abs(fmod((H / 60), 2) - 1));
+	const float X = C * (1 - abs(fmodf((H / 60), 2) - 1));
 	const float m = V - C;
 
 	LinearColor Result;
