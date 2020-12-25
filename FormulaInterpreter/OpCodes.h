@@ -1,8 +1,19 @@
-﻿
+﻿#pragma once
+
 #include <set>
 
 #include "../Types.h"
 
+/**
+ * OpCode enumeration
+ *
+ * OpCode used in @see FormulaInterpreter as a payload of the interpretation of bytecode
+ * 
+ * Each opcode must be registered in next entities:
+ *  mainly @see InstructionsInfo [OpCodeDefs.h]
+ *  @see AllowedOpCodes [OpCodes.h]
+ *  @see OpCode2StrMap [OpCodes.h]
+ */
 enum class EOpCode : uint8
 {
     OP_LOAD = 0x0,      // LOAD   SLOT, MEM_SLOT                    ; Load from memory to slot
@@ -39,9 +50,9 @@ enum class EOpCode : uint8
     OP_CALLF = 0x90,   // CALLF   SLOT, FUNC_SLOT                   ; Calls function FUNC_SLOT on SLOT:   Slot = sin(Slot)
 };
 
-
-
-
+/**
+ * These codes are allowed to use and not restricted by @see FormulaInterpreter
+ */
 static std::set<EOpCode> AllowedOpCodes = {
     EOpCode::OP_LOAD,
     EOpCode::OP_MOV,
@@ -67,6 +78,9 @@ static std::set<EOpCode> AllowedOpCodes = {
     EOpCode::OP_PUSHC,
 };
 
+/**
+ * Each opcode should has string representation in debug purposes
+ */
 static std::map<EOpCode, const char*> OpCode2StrMap = {
     {EOpCode::OP_LOAD, "LOAD"},
     {EOpCode::OP_MOV, "MOV"},
@@ -84,7 +98,7 @@ static std::map<EOpCode, const char*> OpCode2StrMap = {
     {EOpCode::OP_DIVCI, "DIVCI"},
     {EOpCode::OP_POW, "POW"},
     {EOpCode::OP_POWC, "POWC"},
-    {EOpCode::OP_POWCI, "PIWCI"},
+    {EOpCode::OP_POWCI, "POWCI"},
     {EOpCode::OP_NEG, "NEG"},
     {EOpCode::OP_CALL1, "CALL1"},
     {EOpCode::OP_CALL2, "CALL2"},
@@ -92,7 +106,9 @@ static std::map<EOpCode, const char*> OpCode2StrMap = {
     {EOpCode::OP_PUSHC, "PUSHC"},
 };
 
-
+/**
+ * Converts Opcode to c string
+ */
 static const char* OpCode2Str(EOpCode OpCode)
 {    
     auto it = OpCode2StrMap.find(OpCode);
