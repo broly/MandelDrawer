@@ -3,6 +3,7 @@
 #include <complex>
 #include "MandelDrawer.h"
 #include "Animation.h"
+#include "FormulaInterpreter/FormulaInterpreter.h"
 
 
 /// This construction is needed to avoid libjpeg bug
@@ -16,7 +17,22 @@ extern "C" FILE * __cdecl __iob_func(void)
 
 int main()
 {
-
+	// TODO: Interpreter test
+	// std::complex<float> a = {1.0, 2.0};
+	// std::complex<float> b = {3.0, 4.0};
+	// FormulaInterpreter fi;
+	// fi.SetVariables({&a, &b});
+	// std::vector<uint8> bytecode = {
+	// 	(uint8)EOpCode::OP_LOAD,      0x1, 0x0,         0x1, 0x0,
+	// 	(uint8)EOpCode::OP_LOAD,      0x0, 0x0,         0x0, 0x0,
+	// 	(uint8)EOpCode::OP_ADD,		  0x1, 0x0,		    0x0, 0x0,
+	// 	(uint8)EOpCode::OP_PUSH,	  0x1, 0x0,
+	// 	
+    // };
+	// fi.Bytecode = bytecode;
+	// fi.CommandsNum = 4;
+	// fi.Execute();
+	// std::cout << fi.Slots[fi.SlotsStack[0]];
 
 	Animation One(
 		25,
@@ -36,7 +52,6 @@ int main()
 		}, 0.33f, 250, 25, {1000, 1000}, {0.f}, 5.f);
 
 	One.StartAnimation();
-	
 
 	
 	//system(); //открывает бмп
