@@ -1,26 +1,55 @@
 ﻿#include "Formula.h"
 
-Formula::Formula(std::string InInputFormula, VariablesList Vars)
+#include "Types.h"
+
+Formula::Formula()
 {
-    InputFormula = InInputFormula;
-    FormulaParser.SetInput(InputFormula.c_str());
-    SetVariables(Vars);
-    bHasDirtyFormula = true;
+    InputFormula = "";
+    FormulaParser.SetInput("");
+    SetVariables(nullptr);
+    bHasDirtyFormula = false;
 }
 
-void Formula::SetVariables(VariablesList Vars)
+Formula::Formula(std::string InInputFormula, std::shared_ptr<VariablesList> Vars)
+{
+    SetFormula(InInputFormula);
+    SetVariables(Vars);
+}
+
+void Formula::SetFormula(std::string InInputFormula)
+{
+    InputFormula = InInputFormula;
+    bHasDirtyFormula = true;
+    FormulaParser.SetInput(InputFormula.c_str());
+}
+
+void Formula::SetVariables(std::shared_ptr<VariablesList> Vars)
 {
     FormulaParser.SetVariables(Vars);
 }
 
-std::complex<float> Formula::EvaluateOnFly()
+void Formula::SetVariable(std::string VarName, Complex* Var)
 {
-    if (bHasDirtyFormula || !FormulaExpression)
-    {
-        bHasDirtyFormula = false;
-        FormulaExpression = FormulaParser.Parse();
-    }
+    FormulaParser.SetVariable(VarName, Var);
+}
 
-    return FormulaExpression->Evaluate();
+void Formula::Parse()
+{
+    bHasDirtyFormula = false;
+    FormulaExpression = FormulaParser.Parse();
+}
+
+Complex Formula::EvaluateOnFly()
+{
+    if (InputFormula != "")
+    {
+        if (bHasDirtyFormula || !FormulaExpression)
+        {
+            Parse();
+        }
+
+        return FormulaExpression->Evaluate();
+    }
+    return {};
 }
 

@@ -18,7 +18,7 @@ struct ExpressionBase
     virtual ~ExpressionBase()
     {}
 
-    virtual std::complex<float> Evaluate() = 0;
+    virtual Complex Evaluate() = 0;
 };
 
 
@@ -31,7 +31,7 @@ struct UnaryExpression : ExpressionBase
     
     std::shared_ptr<ExpressionBase> Argument;
 
-    virtual std::complex<float> Evaluate() override;
+    virtual Complex Evaluate() override;
 };
 
 
@@ -47,32 +47,35 @@ struct BinaryExpression : ExpressionBase
     std::shared_ptr<ExpressionBase> Right;
 
     
-    virtual std::complex<float> Evaluate() override;
+    virtual Complex Evaluate() override;
 };
 
 struct NumberExpression : ExpressionBase
 {
     NumberExpression(std::string InToken)
         : ExpressionBase(InToken)
+        , bWasCached(false)
     {}
 
+    bool bWasCached;
+    Complex CachedNumber;
     
-    virtual std::complex<float> Evaluate() override;
+    virtual Complex Evaluate() override;
 };
 
 
 
 struct VariableExpression : ExpressionBase
 {
-    VariableExpression(std::string InToken, VariablesList InVars)
+    VariableExpression(std::string InToken, std::shared_ptr<VariablesList> InVars)
         : ExpressionBase(InToken)
         , Vars(InVars)
     {}
 
     
-    virtual std::complex<float> Evaluate() override;
+    virtual Complex Evaluate() override;
     
-    VariablesList Vars;
+    std::shared_ptr<VariablesList> Vars;
 };
 
 

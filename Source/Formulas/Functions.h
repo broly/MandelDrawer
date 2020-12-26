@@ -7,7 +7,7 @@
 
 /** Helper macro to use each pristine function */
 #define BUILTIN_SINGLE_ARG_FUNC(func_name) \
-    static std::complex<float> func_name(std::complex<float> x) { return std::func_name(x); }
+    static Complex func_name(Complex x) { return std::func_name(x); }
 
 /**
  * All single-arg functions
@@ -21,13 +21,13 @@ struct _SingleFunctions
     BUILTIN_SINGLE_ARG_FUNC(sqrt);
     BUILTIN_SINGLE_ARG_FUNC(abs);
     // ******* END PRISTINE ********
-    static std::complex<float> negate(std::complex<float> x) { return -x; };
-    static std::complex<float> positive(std::complex<float> x) { return +x; };
+    static Complex negate(Complex x) { return -x; };
+    static Complex positive(Complex x) { return +x; };
     // ...
 };
 
 /** Type of single-arg function */
-using SingleFunctionType = std::complex<float>(*)(std::complex<float> x);
+using SingleFunctionType = Complex(*)(Complex x);
 
 struct SingleFunctionInfo
 {

@@ -1,4 +1,5 @@
-﻿#define _CRT_SECURE_NO_WARNINGS
+﻿
+#define _CRT_SECURE_NO_WARNINGS
 
 #include <iostream>
 #include <complex>
@@ -21,16 +22,9 @@ extern "C" FILE * __cdecl __iob_func(void)
 
 int main()
 {
-	std::complex<float> x = 1.f;
-	std::complex<float> y = 2.f;
-
-	Formula f("(-5 + 5i) + x", {{{"x", &x}, {"y", &y}}});
-
-	std::cout << f.EvaluateOnFly();
-	
 	// TODO: Interpreter test
-	// std::complex<float> a = {1.0, 2.0};
-	// std::complex<float> b = {3.0, 4.0};
+	// Complex a = {1.0, 2.0};
+	// Complex b = {3.0, 4.0};
 	// FormulaInterpreter fi;
 	// fi.SetVariables({&a, &b});
 	// std::vector<uint8> bytecode = {
@@ -56,11 +50,16 @@ int main()
 		true,
 		{},
 		{},
-		EMandelDrawMethod::MultiThreaded_ByPixelOrder
+		EMandelDrawMethod::MultiThreaded_ByPixelOrder,
+		true,
+		"z^(-2)",
+		nullptr
 	};
 
+	auto t = std::clock();
+
 	Animation One(
-		25,
+		1,
 		{
 			{0.0, {0.0, 0.0}},
 			{1.0, {0.3, 0.0}},
@@ -77,6 +76,8 @@ int main()
 		}, Settings);
 
 	One.StartAnimation();
+
+	std::cout << "Total time: " << std::clock() - t << std::endl;
 
 	
 	//system(); //открывает бмп

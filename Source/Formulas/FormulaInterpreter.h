@@ -11,31 +11,31 @@
 class FormulaInterpreter
 {
 public:
-    void SetVariables(std::vector<std::complex<float>*> VarsList);
+    void SetVariables(std::vector<Complex*> VarsList);
 
-    std::complex<float> Execute();
+    Complex Execute();
 
 
-    void SetAtSlot(uint32 SlotIndex, std::complex<float>& Value);
-    std::complex<float>& GetAtSlot(uint32 SlotIndex);
+    void SetAtSlot(uint32 SlotIndex, Complex& Value);
+    Complex& GetAtSlot(uint32 SlotIndex);
     void CopyToSlotFromSlot(uint32 DestSlotIndex, uint32 SourceSlotIndex);
     void PushSlotIndex(int32 SlotIndex);
-    std::complex<float>& GetAtMemSlot(uint32 MemSlotIndex) const;
+    Complex& GetAtMemSlot(uint32 MemSlotIndex) const;
 
     template<typename T>
     void StepBytecode(uint8*& ByteCodePtrRef, const char* Reason = nullptr);
 
     uint16 Read_SlotIndex(uint8*& Bytecode);
-    std::complex<float>* Read_ValuePtr(uint8*& Bytecode);
+    Complex* Read_ValuePtr(uint8*& Bytecode);
     
 
-    std::vector<std::map<char*, std::complex<float>*>> Vars;
+    std::vector<std::map<char*, Complex*>> Vars;
 
     std::vector<uint8> Bytecode;
     uint32 CommandsNum;
 
-    std::vector<std::complex<float>> Slots;
-    std::vector<std::complex<float>*> MemSlots;
+    std::vector<Complex> Slots;
+    std::vector<Complex*> MemSlots;
 
     std::vector<int32> SlotsStack;
 };

@@ -8,12 +8,12 @@
 #include "OpCodeDefs.h"
 
 
-void FormulaInterpreter::SetVariables(std::vector<std::complex<float>*> VarsList)
+void FormulaInterpreter::SetVariables(std::vector<Complex*> VarsList)
 {
     MemSlots = VarsList;
 }
 
-std::complex<float> FormulaInterpreter::Execute()
+Complex FormulaInterpreter::Execute()
 {
     uint8* MostRecentBytecodePtr = Bytecode.data();
     
@@ -42,21 +42,21 @@ std::complex<float> FormulaInterpreter::Execute()
     return {0.f, 0.f};
 }
 
-void FormulaInterpreter::SetAtSlot(uint32 SlotIndex, std::complex<float>& Value)
+void FormulaInterpreter::SetAtSlot(uint32 SlotIndex, Complex& Value)
 {
     if (Slots.size() <= SlotIndex)
         Slots.resize(SlotIndex + 10, {0.f, 0.f});
     Slots[SlotIndex] = Value;
 }
 
-std::complex<float>& FormulaInterpreter::GetAtSlot(uint32 SlotIndex)
+Complex& FormulaInterpreter::GetAtSlot(uint32 SlotIndex)
 {
     return Slots[SlotIndex];
 }
 
 void FormulaInterpreter::CopyToSlotFromSlot(uint32 DestSlotIndex, uint32 SourceSlotIndex)
 {
-    std::complex<float>& Value = Slots[SourceSlotIndex];
+    Complex& Value = Slots[SourceSlotIndex];
     SetAtSlot(DestSlotIndex, Value);
 }
 
@@ -65,9 +65,9 @@ void FormulaInterpreter::PushSlotIndex(int32 SlotIndex)
     SlotsStack.push_back(SlotIndex);
 }
 
-std::complex<float>& FormulaInterpreter::GetAtMemSlot(uint32 MemSlotIndex) const
+Complex& FormulaInterpreter::GetAtMemSlot(uint32 MemSlotIndex) const
 {
-    std::complex<float>* ValuePtr = MemSlots[MemSlotIndex];
+    Complex* ValuePtr = MemSlots[MemSlotIndex];
     return *ValuePtr;
 }
 
@@ -78,9 +78,9 @@ uint16 FormulaInterpreter::Read_SlotIndex(uint8*& Bytecode)
     return Result;
 }
 
-std::complex<float>* FormulaInterpreter::Read_ValuePtr(uint8*& Bytecode)
+Complex* FormulaInterpreter::Read_ValuePtr(uint8*& Bytecode)
 {
-    std::complex<float>* Result = (std::complex<float>*)Bytecode;
-    StepBytecode<std::complex<float>>(Bytecode, "READ COMPLEX NUMBER");
+    Complex* Result = (Complex*)Bytecode;
+    StepBytecode<Complex>(Bytecode, "READ COMPLEX NUMBER");
     return Result;
 }

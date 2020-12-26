@@ -45,7 +45,7 @@ static std::map<EOpCode, std::function<OpCode_FuncType>> InstructionsInfo = {
         [] (FormulaInterpreter& Interpreter, uint8*& Bytecode)
         {
             const uint16 DestSlotIndex = Interpreter.Read_SlotIndex(Bytecode);
-            std::complex<float>* ValuePtr = Interpreter.Read_ValuePtr(Bytecode);
+            Complex* ValuePtr = Interpreter.Read_ValuePtr(Bytecode);
             Interpreter.SetAtSlot(DestSlotIndex, *ValuePtr);
         }
     },
@@ -73,7 +73,7 @@ static std::map<EOpCode, std::function<OpCode_FuncType>> InstructionsInfo = {
         [] (FormulaInterpreter& Interpreter, uint8*& Bytecode)
         {
             const uint16 SlotIndex = Interpreter.Read_SlotIndex(Bytecode);
-            std::complex<float>* ValuePtr = Interpreter.Read_ValuePtr(Bytecode);
+            Complex* ValuePtr = Interpreter.Read_ValuePtr(Bytecode);
 
             auto& Value = Interpreter.GetAtSlot(SlotIndex);
             Value += *ValuePtr;
@@ -96,7 +96,7 @@ static std::map<EOpCode, std::function<OpCode_FuncType>> InstructionsInfo = {
         [] (FormulaInterpreter& Interpreter, uint8*& Bytecode)
         {
             const uint16 SlotIndex = Interpreter.Read_SlotIndex(Bytecode);
-            std::complex<float>* ValuePtr = Interpreter.Read_ValuePtr(Bytecode);
+            Complex* ValuePtr = Interpreter.Read_ValuePtr(Bytecode);
 
             auto& Value = Interpreter.GetAtSlot(SlotIndex);
             Value -= *ValuePtr;
@@ -119,7 +119,7 @@ static std::map<EOpCode, std::function<OpCode_FuncType>> InstructionsInfo = {
         [] (FormulaInterpreter& Interpreter, uint8*& Bytecode)
         {
             const uint16 SlotIndex = Interpreter.Read_SlotIndex(Bytecode);
-            std::complex<float>* ValuePtr = Interpreter.Read_ValuePtr(Bytecode);
+            Complex* ValuePtr = Interpreter.Read_ValuePtr(Bytecode);
 
             auto& Value = Interpreter.GetAtSlot(SlotIndex);
             Value *= *ValuePtr;
@@ -142,7 +142,7 @@ static std::map<EOpCode, std::function<OpCode_FuncType>> InstructionsInfo = {
         [] (FormulaInterpreter& Interpreter, uint8*& Bytecode)
         {
             const uint16 SlotIndex = Interpreter.Read_SlotIndex(Bytecode);
-            std::complex<float>* ValuePtr = Interpreter.Read_ValuePtr(Bytecode);
+            Complex* ValuePtr = Interpreter.Read_ValuePtr(Bytecode);
 
             auto& Value = Interpreter.GetAtSlot(SlotIndex);
             Value /= *ValuePtr;

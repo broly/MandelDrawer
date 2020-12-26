@@ -7,6 +7,8 @@
 #include "Functions.h"
 #include "Operators.h"
 #include "CommonTools.h"
+#include <sstream>
+#include <string>
 
 bool ReplaceStr(std::string& str, const std::string& from, const std::string& to)
 {
@@ -17,7 +19,7 @@ bool ReplaceStr(std::string& str, const std::string& from, const std::string& to
     return true;
 }
 
-std::complex<float> UnaryExpression::Evaluate()
+Complex UnaryExpression::Evaluate()
 {
     if (const auto func_info = FindBy(SingleFunctions, [=] (const SingleFunctionInfo& v) { return v.FunctionName == Token; }))
     {
@@ -27,7 +29,7 @@ std::complex<float> UnaryExpression::Evaluate()
     return {};
 }
 
-std::complex<float> BinaryExpression::Evaluate()
+Complex BinaryExpression::Evaluate()
 {
     if (const auto func_info = FindBy(BinaryOperators, [=] (const BinaryOperator& v) { return Token == v.Token; }))
     {
@@ -39,22 +41,41 @@ std::complex<float> BinaryExpression::Evaluate()
     return {};
 }
 
-std::complex<float> NumberExpression::Evaluate()
+template<typename T>
+T StringToNumber(const std::string& numberAsString)
 {
-    std::string tk = Token;
-    const bool bIsImaginary = ReplaceStr(tk, "i", "");
-    const float Value = std::stof(tk);
-    return bIsImaginary ? std::complex<float>{0.f, Value} : std::complex<float>{Value, 0.f};
+    T valor;
+
+    std::stringstream stream(numberAsString);
+    stream >> valor;
+    if (stream.fail()) {
+        std::runtime_error e(numberAsString);
+        throw e;
+    }
+    return valor;
 }
 
-std::complex<float> VariableExpression::Evaluate()
+Complex NumberExpression::Evaluate()
 {
-    
-    for (auto& pair : Vars.Vars)
+    if (!bWasCached)
     {
-        if (pair.first == Token)
-            return *pair.second;
+        std::string tk = Token;
+        const bool bIsImaginary = ReplaceStr(tk, "i", "");
+        const double Value = StringToNumber<double>(tk); // std::stof(tk);
+        CachedNumber = bIsImaginary ? Complex{0.f, Value} : Complex{Value, 0.f};
+        bWasCached = true;
     }
+    return CachedNumber;
+}
+
+Complex VariableExpression::Evaluate()
+{
+    if (Vars)
+        for (auto& pair : Vars->Vars)
+        {
+            if (pair.first == Token)
+                return *pair.second;
+        }
 
     throw std::runtime_error(std::string("Can't find variable: ") + Token);
 }

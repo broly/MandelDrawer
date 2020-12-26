@@ -2,16 +2,26 @@
 #include <string>
 
 #include "Parser.h"
+#include "Types.h"
+#include <iostream>
 
 class Formula
 {
 public:
+    Formula();
     
-    Formula(std::string InInputFormula, VariablesList Vars);
+    Formula(std::string InInputFormula, std::shared_ptr<VariablesList> Vars = nullptr);
 
-    void SetVariables(VariablesList Vars);
 
-    std::complex<float> EvaluateOnFly();
+    void SetFormula(std::string InInputFormula);
+
+    void SetVariables(std::shared_ptr<VariablesList> Vars);
+
+    void SetVariable(std::string VarName, Complex* Var);
+
+    void Parse();
+    
+    Complex EvaluateOnFly();
 
 
 protected:

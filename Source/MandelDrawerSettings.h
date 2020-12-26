@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include "Vector2D.h"
+#include "Formulas/Formula.h"
 
 /**
  * Fractal drawing method.
@@ -8,7 +9,7 @@
 enum class EMandelDrawMethod
 {
 	// SingleThread,  // todo: planned
-	MultiThreaded_ByChunk,
+	// MultiThreaded_ByChunk,  // todo DEPRECATED
 	MultiThreaded_ByPixelOrder,
 	// CUDA,  // todo: planned
 };
@@ -45,4 +46,13 @@ struct MandelDrawerSettings
 
     /** Render method */
     EMandelDrawMethod MandelDrawMethod = EMandelDrawMethod::MultiThreaded_ByPixelOrder;
+
+	/** */
+	bool bUsesCustomFormula = false;
+
+	/** */
+	std::string CustomFormula = "";
+
+	/** */
+	std::shared_ptr<VariablesList> FormulaVariables = nullptr;
 };

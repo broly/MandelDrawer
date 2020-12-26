@@ -29,7 +29,7 @@ class MandelDrawer
 public:
 	MandelDrawer()
 		  : Settings({})
-		  , FractalPicture(Image(Settings.Resolution))
+		  , TargetPicture(Image(Settings.Resolution))
 		  , SavePath("Output/image.bmp")
 		  , StartTime(0)
 		  , FinishTime(0)
@@ -41,11 +41,12 @@ public:
 		const char* InSavePath = "Output/image.bmp"
 	)
 		  : Settings(InSettings)
-		  , FractalPicture(Image(InSettings.Resolution))
+		  , TargetPicture(Image(InSettings.Resolution))
 		  , SavePath(InSavePath)
 		  , StartTime(0)
 		  , FinishTime(0)
 	{
+		
 	}
 
 	/**
@@ -76,8 +77,12 @@ public:
 		// Note the finish time
 		FinishTime = std::clock();
 
+		if (Settings.MandelDrawMethod == EMandelDrawMethod::MultiThreaded_ByPixelOrder)
+		{
+			TargetPicture.CompositeHorizontal(WorkersTargets);
+		}
 		// Save fractal image
-		FractalPicture.SaveToFileJ(SavePath);
+		TargetPicture.SaveToFileJ(SavePath);
 	}
 
 	/**
@@ -114,6 +119,8 @@ public:
 	{
 		WorkersProgress.clear();
 		WorkersStatus.clear();
+		CustomFormulaZValue_ByWorker.clear();
+		CustomFormula_ByWorker.clear();
 
 		// We must create some amount of threads here
 		for (int i = 0; i < Settings.NumThreads; i++)
@@ -126,15 +133,36 @@ public:
 			WorkersProgress.push_back(WorkerProgress);
 			WorkersStatus.push_back(WorkerStatus);
 
+			if (Settings.bUsesCustomFormula)
+			{
+				Complex Value;
+				CustomFormulaZValue_ByWorker.emplace_back(Value);
+
+				CustomFormula_ByWorker.emplace_back(nullptr);
+			}
+
+			if (Settings.MandelDrawMethod == EMandelDrawMethod::MultiThreaded_ByPixelOrder)
+			{
+				if (i >= WorkersTargets.size())
+				{
+					Image Target = Image({Settings.Resolution.X / Settings.NumThreads, Settings.Resolution.Y});
+					WorkersTargets.push_back(std::move(Target));
+				}
+			}
+		}
+
+		for (int i = 0; i < Settings.NumThreads; i++)
+		{
+			
 			// Create new thread here
 			std::thread mandel_worker([=]
-				{
-					// Here is thread will start
-					StartWorker(i);
+                {
+                    // Here is thread will start
+                    StartWorker(i);
 
-					// Send status about work is complete
-					WorkersStatus[i] = true;
-				});
+                    // Send status about work is complete
+                    WorkersStatus[i] = true;
+                });
 			
 			// We must detach this thread from current (main) thread to make parallel compution
 			mandel_worker.detach();
@@ -147,34 +175,34 @@ public:
 	 */
 	void StartWorker(int WorkerID)
 	{
+		if (Settings.bUsesCustomFormula)
+		{
+
+			auto CustomFormula = std::make_shared<Formula>();
+			CustomFormula->SetFormula(Settings.CustomFormula);
+
+			CustomFormula->SetVariable("z", &CustomFormulaZValue_ByWorker[WorkerID]);
+
+			CustomFormula->Parse();
+
+			if (Settings.FormulaVariables)
+			{
+				CustomFormula->SetVariables(Settings.FormulaVariables);
+			}
+			else
+			{
+				auto Variables = std::make_shared<VariablesList>();
+				CustomFormula->SetVariables(Variables);
+			}
+
+			CustomFormula_ByWorker[WorkerID] = CustomFormula;
+		}
+
 		switch (Settings.MandelDrawMethod)
 		{
-		case EMandelDrawMethod::MultiThreaded_ByChunk:
-			Draw_ByChunk(WorkerID);
 		case EMandelDrawMethod::MultiThreaded_ByPixelOrder:
 			Draw_ByPixelOrder(WorkerID);
 		}
-	}
-
-	/**
-	 * Rendering process by chunk
-	 * @param WorkerID: Worker identifier that represents which part of image (chunk)
-	 *   must be rendered by corresponding thread
-	 */
-	void Draw_ByChunk(int WorkerID)
-	{
-		const int ChunkSizeX = Settings.Resolution.X / Settings.NumThreads;
-		const IntVector2D ChunkPosition = { ChunkSizeX * WorkerID, 0 };
-		const IntVector2D ChunkSize = { ChunkSizeX, Settings.Resolution.Y };
-		for (int x = ChunkPosition.X; x < ChunkPosition.X + ChunkSize.X; x++)
-		{
-			for (int y = ChunkPosition.Y; y < ChunkPosition.Y + ChunkSize.Y; y++)
-				DrawPixel(x, y);
-
-			const float percents = float(x) / ChunkSize.Y;
-			WorkersProgress[WorkerID] = percents;
-		}
-		WorkersProgress[WorkerID] = 1.f;
 	}
 	
 	/**
@@ -190,7 +218,7 @@ public:
 		for (int x = StartX; x < Settings.Resolution.X; x += StepX)
 		{
 			for (int y = 0; y < Settings.Resolution.Y; y++)
-				DrawPixel(x, y);
+				DrawPixel(x, y, WorkerID);
 
 			const float percents = float(x) / Settings.Resolution.Y;
 			WorkersProgress[WorkerID] = percents;
@@ -203,43 +231,56 @@ public:
 	 * @param x: Axis X
 	 * @param y: Axis Y
 	 */
-	void DrawPixel(int x, int y)
+	void DrawPixel(int x, int y, int WorkerID)
 	{
 		const FloatVector2D Point_Screen = {x, y};
 		const FloatVector2D Point_Rel = (Point_Screen - Settings.Resolution/2.f) / (Settings.Resolution * Settings.DrawScale) - Settings.DrawOffset;
 				
-		std::complex<double> c(Point_Rel.X, Point_Rel.Y);
-		float m = Fractal(c);
+		Complex c(Point_Rel.X, Point_Rel.Y);
+		float m = Fractal(c, WorkerID);
 
-		// TODO: Example with HSV
+		 // TODO: Example with HSV
 		 Color color = LinearColor {
 		 	((m / Settings.IterLimit) * 480) + 45,
 		 	0.7f,
 		 	((m / (float)Settings.IterLimit) == 0) ? (m / Settings.IterLimit * 6) : 1,
 		 }.HSV2RGB() ^ 2;
 
-		//Color color = LinearColor {
-		//	m < IterLimit ? 0.f : 1.f,
-        //    0.f,
-        //    m / IterLimit,
-        //};
-
-		FractalPicture.SetColor(x, y, color);
+		auto& img = WorkersTargets[WorkerID];
+		img.SetColor(x / Settings.NumThreads, y, color);
 	}
 
+	
 	/**
 	 * Main logic of fractal calculation
 	 * @param InC: Complex number on complex plane may be inside or outside of Julia/Mandelbrot set
 	 * @return Color of this point on complex plane (represents whether this point inside/near/outside of Julia/Mandelbrot set)
 	 */
-	float Fractal(std::complex<double> InC) const
+	float Fractal(Complex InC, int WorkerID) const
 	{
-		std::complex<double> z = InC;
-		const std::complex<double> c = Settings.bJuliaMode ? std::complex<double>(Settings.JuliaValue.X, Settings.JuliaValue.Y) : InC;
+		Complex z = InC;
+
+		if (Settings.bUsesCustomFormula)
+		{
+			CustomFormulaZValue_ByWorker[WorkerID] = z;
+			CustomFormula_ByWorker[WorkerID]->SetVariable("z", &CustomFormulaZValue_ByWorker[WorkerID]);
+		}
+		
+		const Complex c = Settings.bJuliaMode ? Complex(Settings.JuliaValue.X, Settings.JuliaValue.Y) : InC;
 		int n = 0;
 		while (abs(z) <= Settings.EscapeValue and n < Settings.IterLimit)
 		{
-			z = std::pow(z, 2) + c;
+			if (!Settings.bUsesCustomFormula)
+			{
+				z = pow(z, -2) + c;
+			}
+			else
+			{
+				z = CustomFormula_ByWorker[WorkerID]->EvaluateOnFly() + c;
+				CustomFormulaZValue_ByWorker[WorkerID] = z;
+			}
+				// z = Settings.CustomFormula.EvaluateOnFly();
+			
 			n += 1;
 		}
 
@@ -264,13 +305,15 @@ private:
 	MandelDrawerSettings Settings;
 
 	/** Picture holder */
-	Image FractalPicture;
+	Image TargetPicture;
 
 	/** Array of atomics that represents progress of each worker (thread) */
 	std::vector<atomwrapper<float>> WorkersProgress;
 	
 	/** Array of atomics that represents status of each worker (thread) - working or finished? */
 	std::vector<atomwrapper<bool>> WorkersStatus;
+
+	std::vector<Image> WorkersTargets;
 
 	/** Image save path */
 	std::string SavePath;
@@ -283,4 +326,8 @@ private:
 
 	/** Pointer to function that call each time when rendering progress has changed */
 	std::function<void(float)> OnProgressChanged;
+
+	mutable std::vector<std::shared_ptr<Formula>> CustomFormula_ByWorker;
+	mutable std::vector<Complex> CustomFormulaZValue_ByWorker;
+
 };

@@ -6,7 +6,7 @@
 
 #include "Operators.h"
 #include "Functions.h"
-#include "../Types.h"
+#include "Types.h"
 
 
 std::string Parser::ParseToken()
@@ -55,14 +55,15 @@ std::string Parser::ParseToken()
         }
     }
 
-    for (auto& pair : OptionalVars.Vars)
-    {
-        if (std::strncmp(Input, pair.first.c_str(), pair.first.size()) == 0)
+    if (OptionalVars)
+        for (auto& pair : OptionalVars->Vars)
         {
-            Input += pair.first.size();
-            return pair.first;
+            if (std::strncmp(Input, pair.first.c_str(), pair.first.size()) == 0)
+            {
+                Input += pair.first.size();
+                return pair.first;
+            }
         }
-    }
 
     if (Input[0] == 0)
         return "";
@@ -72,14 +73,24 @@ std::string Parser::ParseToken()
     throw std::runtime_error(msg);
 }
 
-void Parser::SetVariables(VariablesList InOptionalVars)
+void Parser::SetVariables(std::shared_ptr<VariablesList> InOptionalVars)
 {
     OptionalVars = InOptionalVars;
 }
 
-void Parser::SetInput(const char* InInput)
+void Parser::SetVariable(std::string VarName, Complex* Var)
 {
-    Input = InInput;
+    if (!OptionalVars)
+        OptionalVars = std::make_shared<VariablesList>();
+
+    OptionalVars->Vars.emplace(VarName, Var);
+
+}
+
+void Parser::SetInput(std::string InInput)
+{
+    Source = InInput;
+    Input = Source.c_str();
 }
 
 std::shared_ptr<ExpressionBase> Parser::ParseSimple()
@@ -135,9 +146,10 @@ std::shared_ptr<ExpressionBase> Parser::Parse()
 
 bool Parser::IsVariable(std::string Token)
 {
-    for (auto& pair : OptionalVars.Vars)
-        if (pair.first == Token)
-            return true;
+    if (OptionalVars)
+        for (auto& pair : OptionalVars->Vars)
+            if (pair.first == Token)
+                return true;
     
     return false;
 }

@@ -4,7 +4,9 @@
 #include <map>
 #include <string>
 
+#include "Types.h"
+
 struct VariablesList
 {
-    std::map<std::string, std::complex<float>*> Vars;
+    std::map<std::string, Complex*> Vars;
 };

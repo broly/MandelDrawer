@@ -1,10 +1,13 @@
 #pragma once
 
+
 #include "Color.h"
 #include "Vector2D.h"
 #include "Types.h"
 #include <sys/stat.h>
 #include <direct.h>
+#include <vector>
+
 
 #include "jpeglib.h"
 
@@ -21,19 +24,41 @@ struct Image
 	Image(IntVector2D InDimension)
 		: Dimension(InDimension)
 		, Size(InDimension.X * InDimension.Y)
-		, Data(new Color[Size])
-	{}
+		, Data(nullptr)
+	{
+		Data = (Color*)malloc(Size * sizeof(Color));
+	}
+
+	Image(Image& Other)
+		: Dimension(Other.Dimension)
+		, Size(Other.Size)
+		, Data(nullptr)
+	{
+		Data = (Color*)malloc(Size * sizeof(Color));
+		memcpy(Data, Other.Data, Size * sizeof(Color));
+	}
+
+	Image(Image&& Other) noexcept
+		: Dimension(Other.Dimension)
+		, Size(Other.Size)
+		, Data(nullptr)
+	{
+		Data = Other.Data;
+		Other.Data = nullptr;
+	}
 
 	~Image()
 	{
-		delete[] Data;
+		if (Data)
+			free(Data);
 	}
+
 
 	IntVector2D Dimension;
 	int Size;
 	Color* Data;
 
-	Color GetColor(int X, int Y)
+	Color& GetColor(int X, int Y)
 	{
 		uint64 Index = GetIndex(X, Y);
 		return Data[Index];
@@ -41,16 +66,16 @@ struct Image
 
 	void SetColor(int X, int Y, Color InColor)
 	{
-		
 		uint64 Index = GetIndex(X, Y);
 		Data[Index] = InColor;
 	}
 
 	uint64 GetIndex(int X, int Y)
 	{
-		int result = Dimension.Y * Y + X;
+		int result = Dimension.X * Y + X;
 		if (result > Size)
-			throw EImageOutOfBoundsException();
+			throw std::runtime_error("Out of bounds");
+
 		return result;
 	}
 
@@ -188,5 +213,26 @@ struct Image
 		jpeg_destroy_compress(&cinfo);
 
 		/* And we're done! */
+	}
+
+	void CompositeHorizontal(std::vector<Image> Images)
+	{
+		int num = Images.size();
+		for(uint32 x = 0; x < Dimension.X; x += num)
+		{
+			for(uint32 y = 0; y < Dimension.Y; y++)
+			{
+				for (int i = 0; i < Images.size(); i++)
+				{
+					if (i + x < Dimension.X)
+					{
+						auto& image = Images[i];
+						auto& color = image.GetColor(x / Images.size(), y);
+					
+						SetColor(x + i, y, color);
+					}
+				}
+			}
+		}
 	}
 };

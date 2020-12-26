@@ -9,23 +9,23 @@
 
 namespace OperatorsPrivate
 {
-    static inline std::complex<float> cceil(std::complex<float> C)
+    static inline Complex cceil(Complex C)
     {
-        return std::complex<float>(std::ceil(C.real()), std::ceil(C.imag()));
+        return Complex(std::ceil(C.real()), std::ceil(C.imag()));
     }
 
 
     struct _BinaryOperatorsImpls
     {
-        static std::complex<float> Add(std::complex<float> A, std::complex<float> B) { return A + B; }
-        static std::complex<float> Sub(std::complex<float> A, std::complex<float> B) { return A - B; }
-        static std::complex<float> Mul(std::complex<float> A, std::complex<float> B) { return A * B; }
-        static std::complex<float> Div(std::complex<float> A, std::complex<float> B) { return A / B; }
-        static std::complex<float> Mod(std::complex<float> A, std::complex<float> B) { return A + B * cceil(-(A / B)); }
-        static std::complex<float> Pow(std::complex<float> A, std::complex<float> B) { return std::pow(A, B); }
+        static Complex Add(Complex A, Complex B) { return A + B; }
+        static Complex Sub(Complex A, Complex B) { return A - B; }
+        static Complex Mul(Complex A, Complex B) { return A * B; }
+        static Complex Div(Complex A, Complex B) { return A / B; }
+        static Complex Mod(Complex A, Complex B) { return A + B * cceil(-(A / B)); }
+        static Complex Pow(Complex A, Complex B) { return std::pow(A, B); }
     };
 
-    using BinaryOperatorFuncType = std::complex<float> (*)(std::complex<float> A, std::complex<float> B);
+    using BinaryOperatorFuncType = Complex (*)(Complex A, Complex B);
     
 }
 
