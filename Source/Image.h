@@ -6,7 +6,7 @@
 #include <sys/stat.h>
 #include <direct.h>
 
-#include <jpeglib.h>
+#include "jpeglib.h"
 
 const int BYTES_PER_PIXEL = 3;
 

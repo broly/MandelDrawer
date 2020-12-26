@@ -1,6 +1,5 @@
 #pragma once
 
-
 #include <algorithm>
 #include <numeric>
 #include <ctime> 
@@ -55,8 +54,12 @@ inline std::string AscTime()
 	time_t t; // t passed as argument in function time()
 	struct tm* tt; // decalring variable for localtime()
 	time(&t); //passing argument to time()
-	tt = localtime(&t);
-	return asctime(tt);
+	localtime_s(tt, &t); 
+
+	char buf[255] = "";
+
+	asctime_s(buf, 255, tt);
+	return buf;
 }
 
 // Returns sum of all elements in vector

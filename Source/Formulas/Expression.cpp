@@ -1,5 +1,4 @@
-﻿#define _CRT_SECURE_NO_WARNINGS
-#include "Expression.h"
+﻿#include "Expression.h"
 
 #include <string>
 
@@ -7,7 +6,7 @@
 #include "Common.h"
 #include "Functions.h"
 #include "Operators.h"
-#include "../CommonTools.h"
+#include "CommonTools.h"
 
 bool ReplaceStr(std::string& str, const std::string& from, const std::string& to)
 {

@@ -2,6 +2,7 @@
 #define _CRT_SECURE_NO_WARNINGS
 #include "MandelDrawer.h"
 #include <algorithm>
+#include <map>
 
 //char buffer[16];
 //
@@ -15,7 +16,8 @@
 struct AnimKeyFrame
 {
 	float Time;
-	FloatVector2D Value;
+	FloatVector2D JuliaValue;
+	std::map<std::string, FloatVector2D> CustomVariables; 
 };
 
 
@@ -27,14 +29,9 @@ public:
 	Animation(
 		float InFarmeRate,
 		std::vector<AnimKeyFrame> InKeyFrames,
-		float DefaultDrawScale = 0.25,
-		int DefaultIterLimit = 150,
-		float DefaultEscapeValue = 10.f,
-		IntVector2D DefaultResolution = {1000, 1000},
-		FloatVector2D DefaultOffset = {0.0f, 0.0f},
-		float DefaultBrightness = 1.f
+		MandelDrawerSettings InSettings
 	)
-		: Fractal(DefaultResolution, 12, DefaultIterLimit, DefaultEscapeValue, DefaultBrightness, EMandelDrawMethod::MultiThreaded_ByPixelOrder, DefaultDrawScale, DefaultOffset, "image.bmp", false, {0.f})
+		: Fractal(InSettings, "image.bmp")
 		, FrameRate(InFarmeRate)
 		, KeyFrames(InKeyFrames)
 	{
@@ -77,7 +74,7 @@ public:
 					// Calculate alpha coefficient that will be used as interpolation value (its ratio between previous values)
 					const float Alpha = TimeBetweenPrevKeyAndCurrentFrame / TimeBetweenKeyFrames; // [2 / 4 = 0,5]
 					// Interpolation between key frame values
-					const FloatVector2D CurrentValue = Lerp(PrevKey.Value, NextKey.Value, Alpha);  // [lerp({1, 2}, {3, 0}, 0.5) = {2, 1}]
+					const FloatVector2D CurrentValue = Lerp(PrevKey.JuliaValue, NextKey.JuliaValue, Alpha);  // [lerp({1, 2}, {3, 0}, 0.5) = {2, 1}]
 
 					char buffer[255];
 

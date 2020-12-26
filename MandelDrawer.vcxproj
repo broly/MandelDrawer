@@ -78,9 +78,11 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
+    <IncludePath>$(ProjectDir)Source;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -116,7 +118,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -131,7 +133,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions);_ITERATOR_DEBUG_EVEL=0</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(ProjectDir)Include</AdditionalIncludeDirectories>
     </ClCompile>
@@ -145,17 +147,18 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="FormulaInterpreter\FormulaCompiler.cpp" />
-    <ClCompile Include="FormulaInterpreter\FormulaInterpreter.cpp">
-      <RuntimeLibrary>MultiThreadedDebugDll</RuntimeLibrary>
-      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
-      <Optimization>Disabled</Optimization>
-      <SupportJustMyCode>true</SupportJustMyCode>
+    <ClCompile Include="Source\Formulas\Expression.cpp" />
+    <ClCompile Include="Source\Formulas\Formula.cpp" />
+    <ClCompile Include="Source\Formulas\FormulaCompiler.cpp" />
+    <ClCompile Include="Source\Formulas\FormulaInterpreter.cpp" />
+    <ClCompile Include="Source\Formulas\Parser.cpp" />
+    <ClCompile Include="Source\Main.cpp">
       <AssemblerOutput>NoListing</AssemblerOutput>
-      <AssemblerListingLocation>x64\Debug\</AssemblerListingLocation>
+      <AssemblerListingLocation>x64\Release\</AssemblerListingLocation>
       <UndefineAllPreprocessorDefinitions>false</UndefineAllPreprocessorDefinitions>
       <BrowseInformation>false</BrowseInformation>
-      <BrowseInformationFile>x64\Debug\</BrowseInformationFile>
+      <BrowseInformationFile>x64\Release\</BrowseInformationFile>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <CompileAs>Default</CompileAs>
       <ConformanceMode>true</ConformanceMode>
       <DiagnosticsFormat>Column</DiagnosticsFormat>
@@ -172,64 +175,71 @@
       <GenerateSourceDependencies>false</GenerateSourceDependencies>
       <GenerateXMLDocumentationFiles>false</GenerateXMLDocumentationFiles>
       <InlineFunctionExpansion>Default</InlineFunctionExpansion>
-      <IntrinsicFunctions>false</IntrinsicFunctions>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
       <IgnoreStandardIncludePath>false</IgnoreStandardIncludePath>
       <LanguageStandard>Default</LanguageStandard>
       <LanguageStandard_C>Default</LanguageStandard_C>
       <MinimalRebuild>false</MinimalRebuild>
-      <ModuleDependenciesFile>x64\Debug\</ModuleDependenciesFile>
-      <ModuleOutputFile>x64\Debug\</ModuleOutputFile>
+      <ModuleDependenciesFile>x64\Release\</ModuleDependenciesFile>
+      <ModuleOutputFile>x64\Release\</ModuleOutputFile>
       <OmitDefaultLibName>false</OmitDefaultLibName>
       <FavorSizeOrSpeed>Neither</FavorSizeOrSpeed>
-      <WholeProgramOptimization>false</WholeProgramOptimization>
-      <ObjectFileName>x64\Debug\</ObjectFileName>
+      <WholeProgramOptimization>true</WholeProgramOptimization>
+      <Optimization>MaxSpeed</Optimization>
+      <ObjectFileName>x64\Release\</ObjectFileName>
       <CallingConvention>Cdecl</CallingConvention>
-      <ProgramDataBaseFileName>x64\Debug\vc142.pdb</ProgramDataBaseFileName>
+      <ProgramDataBaseFileName>x64\Release\vc142.pdb</ProgramDataBaseFileName>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderOutputFile>x64\Debug\MandelDrawer.pch</PrecompiledHeaderOutputFile>
+      <PrecompiledHeaderOutputFile>x64\Release\MandelDrawer.pch</PrecompiledHeaderOutputFile>
       <PreprocessToFile>false</PreprocessToFile>
       <PreprocessKeepComments>false</PreprocessKeepComments>
       <PreprocessSuppressLineNumbers>false</PreprocessSuppressLineNumbers>
       <RemoveUnreferencedCodeData>true</RemoveUnreferencedCodeData>
+      <RuntimeLibrary>MultiThreadedDll</RuntimeLibrary>
       <ShowIncludes>false</ShowIncludes>
-      <SourceDependenciesFile>x64\Debug\</SourceDependenciesFile>
+      <SourceDependenciesFile>x64\Release\</SourceDependenciesFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <BufferSecurityCheck>true</BufferSecurityCheck>
       <SmallerTypeCheck>false</SmallerTypeCheck>
       <SpectreMitigation>false</SpectreMitigation>
       <StructMemberAlignment>Default</StructMemberAlignment>
-      <TrackerLogDirectory>x64\Debug\MandelDrawer.tlog\</TrackerLogDirectory>
+      <SupportJustMyCode>false</SupportJustMyCode>
+      <TrackerLogDirectory>x64\Release\MandelDrawer.tlog\</TrackerLogDirectory>
       <MinimalRebuildFromTracking>true</MinimalRebuildFromTracking>
       <TreatWarningAsError>false</TreatWarningAsError>
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
       <UseFullPaths>true</UseFullPaths>
       <WarningLevel>Level3</WarningLevel>
-      <XMLDocumentationFileName>x64\Debug\</XMLDocumentationFileName>
-      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <XMLDocumentationFileName>x64\Release\</XMLDocumentationFileName>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <IntelJCCErratum>false</IntelJCCErratum>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;_UNICODE;UNICODE;</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;_UNICODE;UNICODE;;_ITERATOR_DEBUG_EVEL=0</PreprocessorDefinitions>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>C:\MandelDrawer\\include;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\MandelDrawer\Include</AdditionalIncludeDirectories>
       <LinkCompiled>true</LinkCompiled>
     </ClCompile>
-    <ClCompile Include="Main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Animation.h" />
-    <ClInclude Include="Color.h" />
-    <ClInclude Include="CommonTools.h" />
-    <ClInclude Include="FormulaInterpreter\FormulaCompiler.h" />
-    <ClInclude Include="FormulaInterpreter\FormulaInterpreter.h" />
-    <ClInclude Include="FormulaInterpreter\Functions.h" />
-    <ClInclude Include="FormulaInterpreter\OpCodes.h" />
-    <ClInclude Include="MandelDrawer.h" />
-    <ClInclude Include="Image.h" />
-    <ClInclude Include="Vector2D.h" />
-    <ClInclude Include="Types.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="FormulaInterpreter\OpCodeDefs.h" />
+    <ClInclude Include="Source\Animation.h" />
+    <ClInclude Include="Source\Color.h" />
+    <ClInclude Include="Source\CommonTools.h" />
+    <ClInclude Include="Source\Formulas\Common.h" />
+    <ClInclude Include="Source\Formulas\Expression.h" />
+    <ClInclude Include="Source\Formulas\Formula.h" />
+    <ClInclude Include="Source\Formulas\FormulaCompiler.h" />
+    <ClInclude Include="Source\Formulas\FormulaInterpreter.h" />
+    <ClInclude Include="Source\Formulas\Functions.h" />
+    <ClInclude Include="Source\Formulas\OpCodeDefs.h" />
+    <ClInclude Include="Source\Formulas\OpCodes.h" />
+    <ClInclude Include="Source\Formulas\Operators.h" />
+    <ClInclude Include="Source\Formulas\Parser.h" />
+    <ClInclude Include="Source\Image.h" />
+    <ClInclude Include="Source\MandelDrawer.h" />
+    <ClInclude Include="Source\MandelDrawerSettings.h" />
+    <ClInclude Include="Source\Types.h" />
+    <ClInclude Include="Source\Vector2D.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

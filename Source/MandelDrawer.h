@@ -13,17 +13,7 @@
 #include "Types.h"
 #include <sstream>
 
-/**
- * Fractal drawing method.
- *	todo Probably must be extended
- */
-enum class EMandelDrawMethod
-{
-	// SingleThread,  // todo: planned
-	MultiThreaded_ByChunk,
-	MultiThreaded_ByPixelOrder,
-	// CUDA,  // todo: planned
-};
+#include "MandelDrawerSettings.h"
 
 
 /**
@@ -38,48 +28,21 @@ class MandelDrawer
 {
 public:
 	MandelDrawer()
-		  : Resolution({1024, 1024})
-		  , FractalPicture(Image(Resolution))
-		  , NumThreads(16)
-		  , IterLimit(150)
-		  , EscapeValue(8)
-		  , Brightness(1)
-		  , DrawScale(1)
+		  : Settings({})
+		  , FractalPicture(Image(Settings.Resolution))
 		  , SavePath("Output/image.bmp")
-		  , bJuliaMode(false)
-		  , JuliaValue({0, 0})
-		  , DrawOffset({0, 0})
-		  , MandelDrawMethod(EMandelDrawMethod::MultiThreaded_ByPixelOrder)
 		  , StartTime(0)
 		  , FinishTime(0)
 	{
 	}
 
 	MandelDrawer(
-		IntVector2D InResolution = {1024, 1024},
-		int InNumThreads = 16,
-		int InIterLimit = 150,
-		float InEscapeValue = 8.0,
-		float InBrightness = 1.f,
-		EMandelDrawMethod InMandelDrawMethod = EMandelDrawMethod::MultiThreaded_ByPixelOrder,
-		float InScale = 1.f,
-		FloatVector2D InOffset = {0.f, 0.f},
-		const char* InSavePath = "Output/image.bmp",
-		bool InJuliaMode = false,
-		FloatVector2D InJuliaValue = {0.f}
+		MandelDrawerSettings InSettings,
+		const char* InSavePath = "Output/image.bmp"
 	)
-		  : Resolution(InResolution)
-		  , FractalPicture(Image(InResolution))
-		  , NumThreads(InNumThreads)
-		  , IterLimit(InIterLimit)
-		  , EscapeValue(InEscapeValue)
-		  , Brightness(InBrightness)
-		  , DrawScale(InScale)
+		  : Settings(InSettings)
+		  , FractalPicture(Image(InSettings.Resolution))
 		  , SavePath(InSavePath)
-		  , bJuliaMode(InJuliaMode)
-		  , JuliaValue(InJuliaValue)
-		  , DrawOffset(InOffset)
-		  , MandelDrawMethod(InMandelDrawMethod)
 		  , StartTime(0)
 		  , FinishTime(0)
 	{
@@ -101,7 +64,7 @@ public:
 		while (Working)
 		{
 			// Compute average threads progress
-			const float Progress = Sum(WorkersProgress) / (float)NumThreads;
+			const float Progress = Sum(WorkersProgress) / (float)Settings.NumThreads;
 
 			// Are all threads complete?
 			Working = !All(WorkersStatus);
@@ -123,7 +86,7 @@ public:
 	 */
 	void SetJuliaMode(bool bValue)
 	{
-		bJuliaMode = bValue;
+		Settings.bJuliaMode = bValue;
 	}
 
 	/**
@@ -132,7 +95,7 @@ public:
 	 */
 	void SetJuliaValue(FloatVector2D Value)
 	{
-		JuliaValue = Value;
+		Settings.JuliaValue = Value;
 	}
 
 	/**
@@ -153,7 +116,7 @@ public:
 		WorkersStatus.clear();
 
 		// We must create some amount of threads here
-		for (int i = 0; i < NumThreads; i++)
+		for (int i = 0; i < Settings.NumThreads; i++)
 		{
 			// Create atomics to store progress and status
 			std::atomic<float> WorkerProgress{ 0.f };
@@ -184,7 +147,7 @@ public:
 	 */
 	void StartWorker(int WorkerID)
 	{
-		switch (MandelDrawMethod)
+		switch (Settings.MandelDrawMethod)
 		{
 		case EMandelDrawMethod::MultiThreaded_ByChunk:
 			Draw_ByChunk(WorkerID);
@@ -200,9 +163,9 @@ public:
 	 */
 	void Draw_ByChunk(int WorkerID)
 	{
-		const int ChunkSizeX = Resolution.X / NumThreads;
+		const int ChunkSizeX = Settings.Resolution.X / Settings.NumThreads;
 		const IntVector2D ChunkPosition = { ChunkSizeX * WorkerID, 0 };
-		const IntVector2D ChunkSize = { ChunkSizeX, Resolution.Y };
+		const IntVector2D ChunkSize = { ChunkSizeX, Settings.Resolution.Y };
 		for (int x = ChunkPosition.X; x < ChunkPosition.X + ChunkSize.X; x++)
 		{
 			for (int y = ChunkPosition.Y; y < ChunkPosition.Y + ChunkSize.Y; y++)
@@ -222,14 +185,14 @@ public:
 	void Draw_ByPixelOrder(int WorkerID)
 	{
 		const int StartX = WorkerID;
-		const int StepX = NumThreads;
+		const int StepX = Settings.NumThreads;
 
-		for (int x = StartX; x < Resolution.X; x += StepX)
+		for (int x = StartX; x < Settings.Resolution.X; x += StepX)
 		{
-			for (int y = 0; y < Resolution.Y; y++)
+			for (int y = 0; y < Settings.Resolution.Y; y++)
 				DrawPixel(x, y);
 
-			const float percents = float(x) / Resolution.Y;
+			const float percents = float(x) / Settings.Resolution.Y;
 			WorkersProgress[WorkerID] = percents;
 		}
 		WorkersProgress[WorkerID] = 1.f;
@@ -243,16 +206,16 @@ public:
 	void DrawPixel(int x, int y)
 	{
 		const FloatVector2D Point_Screen = {x, y};
-		const FloatVector2D Point_Rel = (Point_Screen - Resolution/2.f) / (Resolution * DrawScale) - DrawOffset;
+		const FloatVector2D Point_Rel = (Point_Screen - Settings.Resolution/2.f) / (Settings.Resolution * Settings.DrawScale) - Settings.DrawOffset;
 				
 		std::complex<double> c(Point_Rel.X, Point_Rel.Y);
 		float m = Fractal(c);
 
 		// TODO: Example with HSV
 		 Color color = LinearColor {
-		 	((m / IterLimit) * 480) + 45,
+		 	((m / Settings.IterLimit) * 480) + 45,
 		 	0.7f,
-		 	((m / (float)IterLimit) == 0) ? (m / IterLimit * 6) : 1,
+		 	((m / (float)Settings.IterLimit) == 0) ? (m / Settings.IterLimit * 6) : 1,
 		 }.HSV2RGB() ^ 2;
 
 		//Color color = LinearColor {
@@ -272,18 +235,18 @@ public:
 	float Fractal(std::complex<double> InC) const
 	{
 		std::complex<double> z = InC;
-		const std::complex<double> c = bJuliaMode ? std::complex<double>(JuliaValue.X, JuliaValue.Y) : InC;
+		const std::complex<double> c = Settings.bJuliaMode ? std::complex<double>(Settings.JuliaValue.X, Settings.JuliaValue.Y) : InC;
 		int n = 0;
-		while (abs(z) <= EscapeValue and n < IterLimit)
+		while (abs(z) <= Settings.EscapeValue and n < Settings.IterLimit)
 		{
 			z = std::pow(z, 2) + c;
 			n += 1;
 		}
 
-		if (n == IterLimit)
-			return (float)IterLimit;
+		if (n == Settings.IterLimit)
+			return (float)Settings.IterLimit;
 
-		return (float)(n + 1 - log(log2(abs(z)))) * Brightness;
+		return (float)(n + 1 - log(log2(abs(z)))) * Settings.Brightness;
 
 	}
 
@@ -297,8 +260,8 @@ public:
 	}
 
 private:
-	/** General resolution of picture */
-	IntVector2D Resolution;
+
+	MandelDrawerSettings Settings;
 
 	/** Picture holder */
 	Image FractalPicture;
@@ -309,35 +272,8 @@ private:
 	/** Array of atomics that represents status of each worker (thread) - working or finished? */
 	std::vector<atomwrapper<bool>> WorkersStatus;
 
-	/** Count of threads that launches workers */
-	int NumThreads;
-
-	/** Fractal calculation iteration limit */
-	int IterLimit;
-
-	/** Fractal calculation escape value */
-	float EscapeValue;
-
-	/** The brightness of picture */
-	float Brightness;
-
-	/** Scale factor of drawing fractal */
-	float DrawScale;
-
 	/** Image save path */
 	std::string SavePath;
-
-	/** Is this fractal calculation in julia mode? @see JuliaValue */
-	bool bJuliaMode;
-
-	/** Julia value coefficient (works only with @see bJuliaMode) */
-	FloatVector2D JuliaValue;
-
-	/** Drawing offset of fractal */
-	FloatVector2D DrawOffset;
-
-	/** Render method */
-	EMandelDrawMethod MandelDrawMethod;
 
 	/** Stored start time of rendering this fractal */
 	std::clock_t StartTime;

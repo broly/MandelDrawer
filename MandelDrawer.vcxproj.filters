@@ -15,30 +15,78 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="MandelDrawer.cpp">
+    <ClCompile Include="Source\Formulas\Expression.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Formulas\Formula.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Formulas\FormulaCompiler.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Formulas\FormulaInterpreter.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Formulas\Parser.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Main.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Color.h">
+    <ClInclude Include="Source\Animation.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
-    <ClInclude Include="Image.h">
+    <ClInclude Include="Source\Color.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
-    <ClInclude Include="CommonTools.h">
+    <ClInclude Include="Source\CommonTools.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
-    <ClInclude Include="MandelDrawer.h">
+    <ClInclude Include="Source\Formulas\Common.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
-    <ClInclude Include="Types.h">
+    <ClInclude Include="Source\Formulas\Expression.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
-    <ClInclude Include="Vector2D.h">
+    <ClInclude Include="Source\Formulas\Formula.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
-    <ClInclude Include="Animation.h">
+    <ClInclude Include="Source\Formulas\FormulaCompiler.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Formulas\FormulaInterpreter.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Formulas\Functions.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Formulas\OpCodeDefs.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Formulas\OpCodes.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Formulas\Operators.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Formulas\Parser.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Image.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\MandelDrawer.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\MandelDrawerSettings.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Types.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Vector2D.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
   </ItemGroup>
