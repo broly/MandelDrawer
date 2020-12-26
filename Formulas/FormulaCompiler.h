@@ -1,0 +1,18 @@
+﻿#pragma once
+#include <string>
+#include <vector>
+
+#include "../Types.h"
+
+class FormulaCompiler
+{
+public:
+    FormulaCompiler(const char* InFormula);
+
+    void Compile();
+
+    const char* Formula;
+    
+    std::vector<uint8> CompiledBytecode;
+
+};

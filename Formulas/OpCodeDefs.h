@@ -165,7 +165,7 @@ static std::map<EOpCode, std::function<OpCode_FuncType>> InstructionsInfo = {
             const uint16 SlotIndex = Interpreter.Read_SlotIndex(Bytecode);
             const uint16 FuncSlotIndex = Interpreter.Read_SlotIndex(Bytecode);
 
-            const SingleFunctionType func = SingleFunctions[FuncSlotIndex];
+            const SingleFunctionType func = SingleFunctions[FuncSlotIndex].Func;
             auto& Value = Interpreter.GetAtSlot(SlotIndex);
             Value = func(Value);
         }

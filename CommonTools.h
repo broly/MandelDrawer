@@ -1,7 +1,8 @@
 #pragma once
-#include <algorithm>
-#include <Windows.h>
 
+
+#include <algorithm>
+#include <numeric>
 #include <ctime> 
 
 /**
@@ -49,7 +50,7 @@ struct atomwrapper
 };
 
 // Returns time as string
-std::string AscTime()
+inline std::string AscTime()
 {
 	time_t t; // t passed as argument in function time()
 	struct tm* tt; // decalring variable for localtime()
@@ -76,4 +77,13 @@ template<typename T>
 T Lerp(T a, T b, float alpha)
 {
 	return a + (b - a) * alpha;
+}
+
+template<typename T, typename Pred>
+const T* FindBy(const std::vector<T>& V, Pred&& Predicate)
+{
+	for (auto& v : V)
+		if (Predicate(v))
+			return &v;
+	return nullptr;
 }
