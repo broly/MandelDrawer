@@ -145,6 +145,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="FormulaInterpreter\FormulaCompiler.cpp" />
     <ClCompile Include="FormulaInterpreter\FormulaInterpreter.cpp">
       <RuntimeLibrary>MultiThreadedDebugDll</RuntimeLibrary>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -218,6 +219,7 @@
     <ClInclude Include="Animation.h" />
     <ClInclude Include="Color.h" />
     <ClInclude Include="CommonTools.h" />
+    <ClInclude Include="FormulaInterpreter\FormulaCompiler.h" />
     <ClInclude Include="FormulaInterpreter\FormulaInterpreter.h" />
     <ClInclude Include="FormulaInterpreter\Functions.h" />
     <ClInclude Include="FormulaInterpreter\OpCodes.h" />
