@@ -13,4 +13,5 @@ typedef signed int int32;
 typedef signed long long int64;
 
 
-using Complex = std::complex<double>;
+using Float = float;
+using Complex = std::complex<Float>;

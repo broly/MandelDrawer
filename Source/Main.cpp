@@ -39,19 +39,19 @@ int main()
 	// fi.Execute();
 	// std::cout << fi.Slots[fi.SlotsStack[0]];
 
-	MandelDrawerSettings Settings
+	MandelDrawerSettings Settings	
 	{
-		{1000, 1000},
+		{2048, 2048},
 		16,
 		250,
-		9.f,
+		25.f,
 		1.f,
-		0.33f,
+		0.35f,
 		true,
 		{},
 		{},
 		EMandelDrawMethod::MultiThreaded_ByPixelOrder,
-		true,
+		false,
 		"z^(-2)",
 		nullptr
 	};
@@ -59,7 +59,7 @@ int main()
 	auto t = std::clock();
 
 	Animation One(
-		1,
+		1000,
 		{
 			{0.0, {0.0, 0.0}},
 			{1.0, {0.3, 0.0}},
@@ -73,7 +73,7 @@ int main()
 			{9.0, {-1.309, 0.f}},
 			{10.0, {-1.767, 0.f}},
 			{11.0, {-2.f, 0.f}},
-		}, Settings);
+		}, Settings, 8820);
 
 	One.StartAnimation();
 

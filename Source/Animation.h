@@ -29,11 +29,13 @@ public:
 	Animation(
 		float InFarmeRate,
 		std::vector<AnimKeyFrame> InKeyFrames,
-		MandelDrawerSettings InSettings
+		MandelDrawerSettings InSettings,
+		uint32 InStartsWith = 0
 	)
 		: Fractal(InSettings, "image.bmp")
 		, FrameRate(InFarmeRate)
 		, KeyFrames(InKeyFrames)
+		, StartsWith(InStartsWith)
 	{
 		// We must sort all KeyFrames before work with it
 		auto predicate = [](const AnimKeyFrame& a, const AnimKeyFrame& b) { return a.Time < b.Time; };
@@ -55,7 +57,7 @@ public:
 	void StartAnimation()
 	{
 		// We must enumerate all frames
-		for (int FrameIndex = 0; FrameIndex < FramesCount; FrameIndex++)   // FramesCount = 250
+		for (int FrameIndex = StartsWith; FrameIndex < FramesCount; FrameIndex++)   // FramesCount = 250
 		{
 			// Current frame time is current frame index divided by frame rate; [FrameRate = 90fps, FrameIndex = 200]
 			const float CurrentFrameTime = (float)FrameIndex / FrameRate;  //    [200 / 90fps = 2.22 sec]
@@ -93,7 +95,7 @@ public:
 	}
 
 private:
-
+	uint32 StartsWith;
 	MandelDrawer Fractal;
 	float FrameRate;
 	int FramesCount;

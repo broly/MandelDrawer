@@ -237,7 +237,7 @@ public:
 		const FloatVector2D Point_Rel = (Point_Screen - Settings.Resolution/2.f) / (Settings.Resolution * Settings.DrawScale) - Settings.DrawOffset;
 				
 		Complex c(Point_Rel.X, Point_Rel.Y);
-		float m = Fractal(c, WorkerID);
+		Float m = Fractal(c, WorkerID);
 
 		 // TODO: Example with HSV
 		 Color color = LinearColor {
@@ -256,7 +256,7 @@ public:
 	 * @param InC: Complex number on complex plane may be inside or outside of Julia/Mandelbrot set
 	 * @return Color of this point on complex plane (represents whether this point inside/near/outside of Julia/Mandelbrot set)
 	 */
-	float Fractal(Complex InC, int WorkerID) const
+	Float Fractal(Complex InC, int WorkerID) const
 	{
 		Complex z = InC;
 
@@ -272,7 +272,7 @@ public:
 		{
 			if (!Settings.bUsesCustomFormula)
 			{
-				z = pow(z, -2) + c;
+				z = z*z + c;
 			}
 			else
 			{

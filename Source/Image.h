@@ -180,7 +180,7 @@ struct Image
 		
 		jpeg_set_defaults(&cinfo);
 		
-		jpeg_set_quality(&cinfo, 90, TRUE /* limit to baseline-JPEG values */);
+		jpeg_set_quality(&cinfo, 99, TRUE /* limit to baseline-JPEG values */);
 
 		
 		jpeg_start_compress(&cinfo, TRUE);

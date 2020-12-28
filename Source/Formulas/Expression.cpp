@@ -61,7 +61,7 @@ Complex NumberExpression::Evaluate()
     {
         std::string tk = Token;
         const bool bIsImaginary = ReplaceStr(tk, "i", "");
-        const double Value = StringToNumber<double>(tk); // std::stof(tk);
+        const Float Value = StringToNumber<Float>(tk); // std::stof(tk);
         CachedNumber = bIsImaginary ? Complex{0.f, Value} : Complex{Value, 0.f};
         bWasCached = true;
     }

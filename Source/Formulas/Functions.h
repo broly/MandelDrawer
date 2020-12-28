@@ -21,8 +21,12 @@ struct _SingleFunctions
     BUILTIN_SINGLE_ARG_FUNC(sqrt);
     BUILTIN_SINGLE_ARG_FUNC(abs);
     // ******* END PRISTINE ********
+
+    // ******* Unary operators *******
     static Complex negate(Complex x) { return -x; };
     static Complex positive(Complex x) { return +x; };
+    // ***** END unary operators *****
+    
     // ...
 };
 
