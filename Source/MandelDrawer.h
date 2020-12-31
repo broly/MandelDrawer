@@ -12,6 +12,8 @@
 #include <ctime>
 #include "Types.h"
 #include <sstream>
+#include <thread>
+#include <chrono>
 
 #include "MandelDrawerSettings.h"
 
@@ -60,30 +62,11 @@ namespace Mandel
 
 			// Start threads
 			StartWorkers();
+
+
 		
 			bool Working = true;
-		
-			while (Working)
-			{
-				// Compute average threads progress
-				const float Progress = Sum(WorkersProgress) / (float)Settings.NumThreads;
 
-				// Are all threads complete?
-				Working = !All(WorkersStatus);
-
-				if (OnProgressChanged)
-					OnProgressChanged(Progress);
-			}
-		
-			// Note the finish time
-			FinishTime = std::clock();
-
-			if (Settings.MandelDrawMethod == EMandelDrawMethod::MultiThreaded_ByPixelOrder)
-			{
-				TargetPicture.CompositeHorizontal(WorkersTargets);
-			}
-			// Save fractal image
-			TargetPicture.SaveToFileJ(SavePath);
 		}
 
 		/**
@@ -108,20 +91,21 @@ namespace Mandel
 		* Setter for save path
 		* @param NewSavePath: Filename to save fractal picture
 		*/
-		void SetSavePath(std::string NewSavePath)
-		{
-			SavePath = NewSavePath;
-		}
+		// void SetSavePath(std::string NewSavePath)
+		// {
+		// 	SavePath = NewSavePath;
+		// }
 
 		/**
 		* Will start workers (threads)
 		*/
 		void StartWorkers()
 		{
+			bIsCooked = false;
+			SetBusy(true);
+			
 			WorkersProgress.clear();
-			WorkersStatus.clear();
-			CustomFormulaZValue_ByWorker.clear();
-			CustomFormula_ByWorker.clear();
+            WorkersStatus.clear();
 
 			// We must create some amount of threads here
 			for (int i = 0; i < Settings.NumThreads; i++)
@@ -131,16 +115,31 @@ namespace Mandel
 				std::atomic<bool> WorkerStatus{ false };
 
 				// Push this atomics into array for each thread
-				WorkersProgress.push_back(WorkerProgress);
-				WorkersStatus.push_back(WorkerStatus);
+                if (i <= WorkersProgress.size())
+                    WorkersProgress.push_back(WorkerProgress);
+                else
+                    WorkersProgress[i] = 0.f;
 
-				if (Settings.bUsesCustomFormula)
-				{
-					Complex Value;
-					CustomFormulaZValue_ByWorker.emplace_back(Value);
+                if (i <= WorkersProgress.size())
+                    WorkersStatus.push_back(WorkerStatus);
+                else
+                    WorkersStatus[i] = false;
 
-					CustomFormula_ByWorker.emplace_back(nullptr);
-				}
+                if (Settings.bUsesCustomFormula)
+                {
+
+                    Complex Value;
+
+                    if (i >= CustomFormulaZValue_ByWorker.size())
+                        CustomFormulaZValue_ByWorker.emplace_back(Value);
+                    else
+                        CustomFormulaZValue_ByWorker[i] = {};
+
+                    if (i >= CustomFormula_ByWorker.size())
+                        CustomFormula_ByWorker.emplace_back(nullptr);
+                    else
+                        CustomFormula_ByWorker[i] = nullptr;
+                }
 
 				if (Settings.MandelDrawMethod == EMandelDrawMethod::MultiThreaded_ByPixelOrder)
 				{
@@ -161,8 +160,6 @@ namespace Mandel
                         // Here is thread will start
                         StartWorker(i);
 
-                        // Send status about work is complete
-                        WorkersStatus[i] = true;
                     });
 			
 				// We must detach this thread from current (main) thread to make parallel compution
@@ -178,6 +175,7 @@ namespace Mandel
 		{
 			if (Settings.bUsesCustomFormula)
 			{
+
 
 				auto CustomFormula = std::make_shared<Formula>();
 				CustomFormula->SetFormula(Settings.CustomFormula);
@@ -223,8 +221,69 @@ namespace Mandel
 
 				const float percents = float(x) / Settings.Resolution.Y;
 				WorkersProgress[WorkerID] = percents;
+
+				// if (WorkerID == 0)
+				// {
+				// 	UpdateProgress();
+				// }
 			}
 			WorkersProgress[WorkerID] = 1.f;
+			
+			// Send status about work is complete
+			WorkersStatus[WorkerID] = true;
+		
+			WaitForOthers();
+		}
+
+		void WaitForFinish()
+		{
+			while (true)
+			{
+				if (!IsBusy())
+				{
+					CookImage();
+					return;
+				}
+				
+				using namespace std::chrono_literals;
+				std::this_thread::sleep_for(10ms);
+			}
+		}
+
+		void WaitForOthers()
+		{
+			while (true)
+			{
+				using namespace std::chrono_literals;
+				
+				const bool Working = !All(WorkersStatus);
+				
+				if (!Working)
+				{
+					SetBusy(false);
+					return;
+				}
+				
+				std::this_thread::sleep_for(10ms);
+			}
+		}
+
+		void CookImage()
+		{
+			if (Settings.MandelDrawMethod == EMandelDrawMethod::MultiThreaded_ByPixelOrder)
+			{
+				TargetPicture.CompositeHorizontal(WorkersTargets);
+			}
+			
+			bIsCooked = true;
+		}
+
+		void SaveImage(std::string ImagePath)
+		{
+			if (HasValidImage())
+			{
+				TargetPicture.SaveToFileJ(ImagePath);
+			}
 		}
 
 		/**
@@ -251,6 +310,21 @@ namespace Mandel
 			img.SetColor(x / Settings.NumThreads, y, color);
 		}
 
+		void UpdateProgress()
+		{
+			// Compute average threads progress
+			// const float Progress = Sum(WorkersProgress) / (float)Settings.NumThreads;
+
+			// Are all threads complete?
+			const bool Working = !All(WorkersStatus);
+
+			if (!Working)
+			{
+				std::cout << "Test" << std::endl;
+				SetBusy(false);
+			}
+		}
+
 	
 		/**
 		* Main logic of fractal calculation
@@ -263,7 +337,8 @@ namespace Mandel
 
 			if (Settings.bUsesCustomFormula)
 			{
-				CustomFormulaZValue_ByWorker[WorkerID] = z;
+                if (WorkerID < CustomFormulaZValue_ByWorker.size())
+                    CustomFormulaZValue_ByWorker[WorkerID] = z;
 				CustomFormula_ByWorker[WorkerID]->SetVariable("z", &CustomFormulaZValue_ByWorker[WorkerID]);
 			}
 		
@@ -273,12 +348,13 @@ namespace Mandel
 			{
 				if (!Settings.bUsesCustomFormula)
 				{
-					z = z*z + c;
+                    z = 1.f/(z*z) + c;
 				}
 				else
 				{
 					z = CustomFormula_ByWorker[WorkerID]->EvaluateOnFly() + c;
-					CustomFormulaZValue_ByWorker[WorkerID] = z;
+                    if (WorkerID < CustomFormulaZValue_ByWorker.size())
+                        CustomFormulaZValue_ByWorker[WorkerID] = z;
 				}
 				// z = Settings.CustomFormula.EvaluateOnFly();
 			
@@ -319,6 +395,21 @@ namespace Mandel
 	        Settings.DrawScale = Scale;
         }
 
+		bool IsBusy() const
+        {
+	        return bIsBusy.load();
+        }
+
+		void SetBusy(bool bBusy)
+        {
+	        bIsBusy.store(bBusy);
+        }
+
+		bool HasValidImage() const
+        {
+	        return bIsCooked;
+        }
+
 
     private:
 
@@ -347,6 +438,10 @@ namespace Mandel
 
 		mutable std::vector<std::shared_ptr<Formula>> CustomFormula_ByWorker;
 		mutable std::vector<Complex> CustomFormulaZValue_ByWorker;
+
+		std::atomic<bool> bIsBusy;
+
+		bool bIsCooked;
 
 	};
 }

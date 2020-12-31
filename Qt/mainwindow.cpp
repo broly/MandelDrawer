@@ -5,6 +5,8 @@
 #include <QGraphicsPixmapItem>
 #include <QTimer>
 
+#define RESOLUTION 512
+
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
@@ -28,7 +30,7 @@ void MainWindow::InitializeMandelDrawer()
 {
     Mandel::MandelDrawerSettings Settings
     {
-        {128, 128},
+        {RESOLUTION, RESOLUTION},
         16,
         150,
         8.f,
@@ -45,12 +47,16 @@ void MainWindow::InitializeMandelDrawer()
 
     GraphicsScene->addItem(&*GraphicsPixmapItem);
 
-    QGraphicsView* GraphicsView = findChild<QGraphicsView*>("GraphicsView");
+    QGraphicsView_MandelDrawer* GraphicsView = findChild<QGraphicsView_MandelDrawer*>("GraphicsView");
+    GraphicsView->OnZoom = std::bind(&MainWindow::OnZoom, this, std::placeholders::_1);
+    GraphicsView->OnPan = std::bind(&MainWindow::OnPan, this, std::placeholders::_1);
 
     GraphicsView->setScene(GraphicsScene);
 
-    QTimer::singleShot(100, this, &MainWindow::Startup);
-
+    QTimer* timer = new QTimer(this);
+    timer->setInterval(10);
+    connect(timer, SIGNAL(timeout()), this, SLOT(Tick()));
+    timer->start();
 }
 
 
@@ -59,63 +65,106 @@ void MainWindow::Startup()
     Redraw();
 }
 
+void MainWindow::Tick()
+{
+    if (bIsDrawing)
+    {
+        if (!MandelDrawer.IsBusy())
+        {
+            bIsDrawing = false;
+            MandelDrawer.CookImage();
+
+            if (GraphicsPixmapItem)
+            {
+
+                QImage image = MandelDrawer.GetTargetPicture().ToQImage();
+
+                GraphicsPixmapItem->setPixmap(QPixmap::fromImage(image));
+
+
+                QGraphicsView* GraphicsView = findChild<QGraphicsView*>("GraphicsView");
+                QRectF Rect = {0, 0, RESOLUTION, RESOLUTION};
+                GraphicsView->fitInView(Rect);
+            }
+        }
+    }
+
+    if (bHasPendingRedraw)
+    {
+        if (!MandelDrawer.IsBusy())
+        {
+            bHasPendingRedraw = false;
+            Redraw();
+        }
+    }
+}
+
 
 void MainWindow::Redraw()
 {
-    MandelDrawer.SetJuliaValue(CurrentJuliaValue);
-    MandelDrawer.SetDrawScale(CurrentZoomValue);
-    MandelDrawer.Start();
-
-    if (GraphicsPixmapItem)
+    if (!MandelDrawer.IsBusy())
     {
-
-        QImage image = MandelDrawer.GetTargetPicture().ToQImage();
-
-        GraphicsPixmapItem->setPixmap(QPixmap::fromImage(image));
-
-
-        QGraphicsView* GraphicsView = findChild<QGraphicsView*>("GraphicsView");
-        QRectF Rect = {0, 0, 128, 128};
-        GraphicsView->fitInView(Rect);
+        bIsDrawing = true;
+        MandelDrawer.SetJuliaValue(CurrentJuliaValue);
+        MandelDrawer.SetDrawScale(CurrentZoomValue);
+        MandelDrawer.Settings.DrawOffset = CurrentPan;
+        MandelDrawer.Start();
+    } else
+    {
+        bHasPendingRedraw = true;
     }
+}
+
+void MainWindow::OnZoom(float Delta)
+{
+    CurrentZoomValue += (Delta / 1200.f) * (CurrentZoomValue);
+    bHasPendingRedraw = true;
+}
+
+
+void MainWindow::OnPan(QPoint Delta)
+{
+    CurrentPan = Mandel::FloatVector2D((CurrentPan.X + Delta.x()) / 100.f, (CurrentPan.Y + Delta.y()) / 100.f);
+    bHasPendingRedraw = true;
 }
 
 void MainWindow::on_ChJuliaMode_stateChanged(int arg1)
 {
     MandelDrawer.SetJuliaMode((bool)arg1);
-    Redraw();
+    bHasPendingRedraw = true;
+    // Redraw();
 }
 
 void MainWindow::on_horizontalSlider_valueChanged(int value)
 {
     CurrentJuliaValue.Y = ((float)value) / 500.f;
-    Redraw();
+    bHasPendingRedraw = true;
+    // Redraw();
 }
 
 void MainWindow::on_verticalSlider_valueChanged(int value)
 {
     CurrentJuliaValue.X = ((float)value) / 500.f;
-    Redraw();
+    bHasPendingRedraw = true;
+    // Redraw();
 }
 
-void MainWindow::on_verticalSlider_2_valueChanged(int value)
-{
-    CurrentZoomValue = float(1000 + value) / 1000;
-    Redraw();
-}
+
 
 void MainWindow::on_ChCustomFormula_stateChanged(int arg1)
 {
     MandelDrawer.Settings.bUsesCustomFormula = (bool)arg1;
+    bHasPendingRedraw = true;
 
-    Redraw();
+    // Redraw();
 }
 
 void MainWindow::on_EditCustomFormula_textChanged(const QString &arg1)
 {
     std::string text = arg1.toStdString();
     MandelDrawer.Settings.CustomFormula = text;
-    Redraw();
+    bHasPendingRedraw = true;
+    // Redraw();
 }
 
 void MainWindow::on_EditCustomFormula_textEdited(const QString &arg1)

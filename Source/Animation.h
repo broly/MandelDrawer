@@ -25,7 +25,7 @@ namespace Mandel
             MandelDrawerSettings InSettings,
             uint32 InStartsWith = 0
         )
-            : Fractal(InSettings, "image.bmp")
+            : Fractal(InSettings)
             , FrameRate(InFarmeRate)
             , KeyFrames(InKeyFrames)
             , StartsWith(InStartsWith)
@@ -75,10 +75,11 @@ namespace Mandel
 
 						snprintf(buffer, 255, "Output/image%04d.bmp", FrameIndex);
 
-						Fractal.SetSavePath(buffer);
+						// Fractal.SetSavePath(buffer);
 						Fractal.SetJuliaValue(CurrentValue);
-
 						Fractal.Start();
+						Fractal.WaitForFinish();
+						Fractal.SaveImage(buffer);
 
 						break;
 					}

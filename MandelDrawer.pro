@@ -9,6 +9,7 @@ CONFIG += c++11
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    Qt/qgraphicsview_mandeldrawer.cpp \
     Qt\QtMain.cpp \
     Qt\mainwindow.cpp \
     Source/Color.cpp \
@@ -20,6 +21,7 @@ SOURCES += \
     Source/Main.cpp
 
 HEADERS += \
+    Qt/qgraphicsview_mandeldrawer.h \
     Qt\mainwindow.h \
     Source/Animation.h \
     Source/Color.h \

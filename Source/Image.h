@@ -163,8 +163,6 @@ namespace Mandel
 #ifdef QT_CORE_LIB
         QImage ToQImage() const
         {
-            qDebug() << Data;
-            qDebug() << Size;
             QImage img(Dimension.X, Dimension.Y, QImage::Format_RGB888);
             auto bytesPerLine = img.bytesPerLine();
             for (int y = 0; y < img.height(); y++)
@@ -252,7 +250,10 @@ namespace Mandel
 		}
 
 		void CompositeHorizontal(std::vector<Image> Images)
-		{
+        {
+            if (Images.size() <= 0)
+                return;
+
 			int num = Images.size();
 			for(uint32 x = 0; x < Dimension.X; x += num)
 			{

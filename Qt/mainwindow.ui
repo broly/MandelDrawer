@@ -14,7 +14,7 @@
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <widget class="QGraphicsView" name="GraphicsView">
+   <widget class="QGraphicsView_MandelDrawer" name="GraphicsView">
     <property name="geometry">
      <rect>
       <x>10</x>
@@ -119,28 +119,6 @@
      <enum>Qt::Vertical</enum>
     </property>
    </widget>
-   <widget class="QSlider" name="verticalSlider_2">
-    <property name="geometry">
-     <rect>
-      <x>360</x>
-      <y>30</y>
-      <width>22</width>
-      <height>261</height>
-     </rect>
-    </property>
-    <property name="minimum">
-     <number>-1000</number>
-    </property>
-    <property name="maximum">
-     <number>1000</number>
-    </property>
-    <property name="value">
-     <number>0</number>
-    </property>
-    <property name="orientation">
-     <enum>Qt::Vertical</enum>
-    </property>
-   </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
@@ -154,6 +132,13 @@
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QGraphicsView_MandelDrawer</class>
+   <extends>QGraphicsView</extends>
+   <header location="global">qgraphicsview_mandeldrawer.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>
