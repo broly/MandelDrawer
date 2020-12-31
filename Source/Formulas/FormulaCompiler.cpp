@@ -4,6 +4,7 @@
 #include <iostream>
 #include <locale>
 
+using namespace Mandel;
 
 FormulaCompiler::FormulaCompiler(const char* InFormula)
 {

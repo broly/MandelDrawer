@@ -6,7 +6,10 @@
 
 #include "Types.h"
 
-struct VariablesList
+namespace Mandel
 {
-    std::map<std::string, Complex*> Vars;
-};
+    struct VariablesList
+    {
+        std::map<std::string, Complex*> Vars;
+    };
+}

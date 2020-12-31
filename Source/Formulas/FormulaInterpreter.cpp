@@ -7,6 +7,7 @@
 #include "Functions.h"
 #include "OpCodeDefs.h"
 
+using namespace Mandel;
 
 void FormulaInterpreter::SetVariables(std::vector<Complex*> VarsList)
 {

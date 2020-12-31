@@ -8,6 +8,7 @@
 #include "Functions.h"
 #include "Types.h"
 
+using namespace Mandel;
 
 std::string Parser::ParseToken()
 {

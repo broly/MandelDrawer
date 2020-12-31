@@ -6,33 +6,36 @@
 #include "Common.h"
 #include "Expression.h"
 
-class Parser
+namespace Mandel
 {
-public:
-    Parser()
-        : Input(nullptr)
-    {}
+    class Parser
+    {
+    public:
+        Parser()
+            : Input(nullptr)
+        {}
     
-    Parser(const char* InInput, std::shared_ptr<VariablesList> InOptionalVars = nullptr)
-        : Input(InInput)
-        , OptionalVars(InOptionalVars)
-    {}
+        Parser(const char* InInput, std::shared_ptr<VariablesList> InOptionalVars = nullptr)
+            : Input(InInput)
+            , OptionalVars(InOptionalVars)
+        {}
     
-    std::string ParseToken();
+        std::string ParseToken();
 
-    void SetVariables(std::shared_ptr<VariablesList> InOptionalVars);
+        void SetVariables(std::shared_ptr<VariablesList> InOptionalVars);
     
-    void SetVariable(std::string VarName, Complex* Var);
+        void SetVariable(std::string VarName, Complex* Var);
     
-    void SetInput(std::string InInput);
+        void SetInput(std::string InInput);
 
-    std::shared_ptr<ExpressionBase> ParseSimple(); // Simple expression
-    std::shared_ptr<ExpressionBase> ParseBinary(int min_priority); // Binary expression
-    std::shared_ptr<ExpressionBase> Parse();
+        std::shared_ptr<ExpressionBase> ParseSimple(); // Simple expression
+        std::shared_ptr<ExpressionBase> ParseBinary(int min_priority); // Binary expression
+        std::shared_ptr<ExpressionBase> Parse();
 
-    bool IsVariable(std::string Token);
+        bool IsVariable(std::string Token);
     
-    std::string Source;
-    const char* Input;
-    std::shared_ptr<VariablesList> OptionalVars; 
-};
+        std::string Source;
+        const char* Input;
+        std::shared_ptr<VariablesList> OptionalVars; 
+    };
+}

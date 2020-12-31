@@ -10,6 +10,7 @@
 #include "Formulas/FormulaInterpreter.h"
 #include "Formulas/Parser.h"
 
+using namespace Mandel;
 
 /// This construction is needed to avoid libjpeg bug
 FILE _iob[] = { *stdin, *stdout, *stderr };

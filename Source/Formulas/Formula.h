@@ -5,32 +5,35 @@
 #include "Types.h"
 #include <iostream>
 
-class Formula
+namespace Mandel
 {
-public:
-    Formula();
+    class Formula
+    {
+    public:
+        Formula();
     
-    Formula(std::string InInputFormula, std::shared_ptr<VariablesList> Vars = nullptr);
+        Formula(std::string InInputFormula, std::shared_ptr<VariablesList> Vars = nullptr);
 
 
-    void SetFormula(std::string InInputFormula);
+        void SetFormula(std::string InInputFormula);
 
-    void SetVariables(std::shared_ptr<VariablesList> Vars);
+        void SetVariables(std::shared_ptr<VariablesList> Vars);
 
-    void SetVariable(std::string VarName, Complex* Var);
+        void SetVariable(std::string VarName, Complex* Var);
 
-    void Parse();
+        void Parse();
     
-    Complex EvaluateOnFly();
+        Complex EvaluateOnFly();
 
 
-protected:
+    protected:
     
-    std::string InputFormula;
+        std::string InputFormula;
     
-    Parser FormulaParser;
+        Parser FormulaParser;
     
-    std::shared_ptr<ExpressionBase> FormulaExpression;
+        std::shared_ptr<ExpressionBase> FormulaExpression;
     
-    bool bHasDirtyFormula;
-};
+        bool bHasDirtyFormula;
+    };
+}

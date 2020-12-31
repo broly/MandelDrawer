@@ -2,6 +2,8 @@
 
 #include "Types.h"
 
+using namespace Mandel;
+
 Formula::Formula()
 {
     InputFormula = "";

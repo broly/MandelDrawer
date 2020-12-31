@@ -4,15 +4,18 @@
 
 #include "../Types.h"
 
-class FormulaCompiler
+namespace Mandel
 {
-public:
-    FormulaCompiler(const char* InFormula);
+    class FormulaCompiler
+    {
+    public:
+        FormulaCompiler(const char* InFormula);
 
-    void Compile();
+        void Compile();
 
-    const char* Formula;
+        const char* Formula;
     
-    std::vector<uint8> CompiledBytecode;
+        std::vector<uint8> CompiledBytecode;
 
-};
+    };
+}
