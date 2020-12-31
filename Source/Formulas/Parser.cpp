@@ -6,7 +6,7 @@
 
 #include "Operators.h"
 #include "Functions.h"
-#include "Types.h"
+#include "../Types.h"
 
 using namespace Mandel;
 

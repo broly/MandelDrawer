@@ -2,7 +2,7 @@
 #include <string>
 
 #include "Parser.h"
-#include "Types.h"
+#include "../Types.h"
 #include <iostream>
 
 namespace Mandel

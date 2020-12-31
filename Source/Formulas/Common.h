@@ -4,7 +4,7 @@
 #include <map>
 #include <string>
 
-#include "Types.h"
+#include "../Types.h"
 
 namespace Mandel
 {

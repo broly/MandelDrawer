@@ -1,6 +1,6 @@
 ﻿#include "Formula.h"
 
-#include "Types.h"
+#include "../Types.h"
 
 using namespace Mandel;
 

@@ -8,8 +8,11 @@
 #include <direct.h>
 #include <vector>
 
-
-#include "jpeglib.h"
+#ifdef QT_CORE_LIB
+    #include <QImage>
+#else
+    #include "jpeglib.h"
+#endif
 
 namespace Mandel
 {
@@ -150,6 +153,10 @@ namespace Mandel
 	
 		void SaveToFileJ(std::string filename)
 		{
+            QImage Image;
+#ifdef QT_CORE_LIB
+
+#else
 			CreateOutputDirectoryIfNotExists();
 		
 			struct jpeg_compress_struct cinfo;
@@ -215,6 +222,7 @@ namespace Mandel
 			jpeg_destroy_compress(&cinfo);
 
 			/* And we're done! */
+#endif
 		}
 
 		void CompositeHorizontal(std::vector<Image> Images)
