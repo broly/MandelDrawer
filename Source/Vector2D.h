@@ -3,7 +3,7 @@
 namespace Mandel
 {
 	template<typename T>
- struct TVector2D
+	struct TVector2D
 	{
 		TVector2D()
             : X(T())
