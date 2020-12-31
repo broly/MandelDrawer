@@ -7,9 +7,11 @@
 #include <sys/stat.h>
 #include <direct.h>
 #include <vector>
+#include <iostream>
 
 #ifdef QT_CORE_LIB
     #include <QImage>
+    #include <QDebug>
 #else
     #include "jpeglib.h"
 #endif
@@ -28,8 +30,8 @@ namespace Mandel
 	{
 		Image(IntVector2D InDimension)
 			: Dimension(InDimension)
-			  , Size(InDimension.X * InDimension.Y)
-			  , Data(nullptr)
+			, Size(InDimension.X * InDimension.Y)
+			, Data(nullptr)
 		{
 			Data = (Color*)malloc(Size * sizeof(Color));
 		}
@@ -149,13 +151,37 @@ namespace Mandel
 
 		}
 
+        void Reset(IntVector2D NewResolution)
+        {
+			Dimension = NewResolution;
+            Size =  NewResolution.X * NewResolution.Y;
+			if (Data)
+				free(Data);
+			Data = (Color*)malloc(Size * sizeof(Color));
+        }
+
+#ifdef QT_CORE_LIB
+        QImage ToQImage() const
+        {
+            qDebug() << Data;
+            qDebug() << Size;
+            QImage img(Dimension.X, Dimension.Y, QImage::Format_RGB888);
+            auto bytesPerLine = img.bytesPerLine();
+            for (int y = 0; y < img.height(); y++)
+            {
+                memcpy(img.scanLine(y), Data + Dimension.X * y, bytesPerLine);
+            }
+            return img;
+        }
+#endif
+
 	
 	
 		void SaveToFileJ(std::string filename)
-		{
-            QImage Image;
+        {
 #ifdef QT_CORE_LIB
 
+            ToQImage().save(filename.c_str(), "JPEG", 99);
 #else
 			CreateOutputDirectoryIfNotExists();
 		

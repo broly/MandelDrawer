@@ -208,14 +208,6 @@ namespace Mandel
 		B = (float)InColor.B / 255.f;
 	}
 
-	LinearColor LinearColor::operator=(const Color& InColor)
-	{
-		R = (float)InColor.R / 255.f;
-		G = (float)InColor.G / 255.f;
-		B = (float)InColor.B / 255.f;
-		return *this;
-	}
-
 
 	inline LinearColor LinearColor::RGB2HSV() const
 	{
@@ -282,10 +274,13 @@ namespace Mandel
 		R = (uint8)(std::min(InColor.R * 255.f, 255.f));
 		G = (uint8)(std::min(InColor.G * 255.f, 255.f));
 		B = (uint8)(std::min(InColor.B * 255.f, 255.f));
+        return *this;
 	}
 
 	inline LinearColor Color::ToLinearColor() const
 	{
 		return *this;
 	}
+
+
 }

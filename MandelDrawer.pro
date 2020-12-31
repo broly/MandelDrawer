@@ -11,6 +11,7 @@ CONFIG += c++11
 SOURCES += \
     Qt\QtMain.cpp \
     Qt\mainwindow.cpp \
+    Source/Color.cpp \
     Source/Formulas/Expression.cpp \
     Source/Formulas/Formula.cpp \
     Source/Formulas/FormulaCompiler.cpp \

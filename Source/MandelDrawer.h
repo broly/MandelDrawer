@@ -301,9 +301,26 @@ namespace Mandel
 			OnProgressChanged = Func;
 		}
 
-	private:
+        void SetSettings(MandelDrawerSettings& InOtherSettings)
+        {
+            Settings = InOtherSettings;
+			TargetPicture.Reset(Settings.Resolution);
+        }
 
 		MandelDrawerSettings Settings;
+
+        Image& GetTargetPicture()
+        {
+            return TargetPicture;
+        }
+
+		void SetDrawScale(float Scale)
+        {
+	        Settings.DrawScale = Scale;
+        }
+
+
+    private:
 
 		/** Picture holder */
 		Image TargetPicture;
