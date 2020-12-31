@@ -50,8 +50,21 @@ Complex Formula::EvaluateOnFly()
             Parse();
         }
 
-        return FormulaExpression->Evaluate();
+        bHasError = GetError(ErrorReason);
+
+        if (!bHasError)
+            return FormulaExpression->Evaluate();
     }
     return {};
+}
+
+bool Formula::GetError(std::string& Reason)
+{
+    if (FormulaExpression->HasError())
+    {
+        Reason = FormulaExpression->GetErrorReason();
+        return true;
+    }
+    return false;
 }
 

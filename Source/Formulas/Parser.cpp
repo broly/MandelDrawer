@@ -69,6 +69,9 @@ std::string Parser::ParseToken()
     if (Input[0] == 0)
         return "";
 
+    
+    return "";
+
     const std::string msg = std::string("Unknown token at") + Input;
     
     throw std::runtime_error(msg);
@@ -98,8 +101,10 @@ std::shared_ptr<ExpressionBase> Parser::ParseSimple()
 {
     // Try to parse first
     auto token = ParseToken();
-    if (token.empty()) 
-        throw std::runtime_error("Invalid input");
+    if (token.empty())
+    {
+        return std::make_shared<ErrorExpression>(Input, std::string("Unknown token ") + token);
+    }
 
     if (std::isdigit(token[0])) // Number is expression also (starts with digit)
         return std::make_shared<NumberExpression>(token);
@@ -112,7 +117,10 @@ std::shared_ptr<ExpressionBase> Parser::ParseSimple()
         auto result = Parse();
         auto NextToken = ParseToken();
         if (NextToken != ")")
-            throw std::runtime_error("Expected ')'");
+        {
+            return std::make_shared<ErrorExpression>(NextToken, "Expected ')'");
+            // throw std::runtime_error("Expected ')'");
+        }
         return result; // parse what between braces
     }
 

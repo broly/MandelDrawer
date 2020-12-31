@@ -20,6 +20,10 @@ namespace Mandel
         {}
 
         virtual Complex Evaluate() = 0;
+
+        virtual bool HasError() = 0;
+
+        virtual std::string GetErrorReason() = 0;
     };
 
 
@@ -33,6 +37,8 @@ namespace Mandel
         std::shared_ptr<ExpressionBase> Argument;
 
         virtual Complex Evaluate() override;
+        virtual bool HasError() override;
+        virtual std::string GetErrorReason() override;
     };
 
 
@@ -49,6 +55,8 @@ namespace Mandel
 
     
         virtual Complex Evaluate() override;
+        virtual bool HasError() override;
+        virtual std::string GetErrorReason() override;
     };
 
     struct NumberExpression : ExpressionBase
@@ -62,6 +70,8 @@ namespace Mandel
         Complex CachedNumber;
     
         virtual Complex Evaluate() override;
+        virtual bool HasError() override;
+        virtual std::string GetErrorReason() override;
     };
 
 
@@ -75,8 +85,24 @@ namespace Mandel
 
     
         virtual Complex Evaluate() override;
+        virtual bool HasError() override;
+        virtual std::string GetErrorReason() override;
     
         std::shared_ptr<VariablesList> Vars;
+    };
+
+    struct ErrorExpression : ExpressionBase
+    {
+        ErrorExpression(std::string InToken, std::string ErrorReason)
+            : ExpressionBase(InToken)
+            , Reason(ErrorReason)
+        {}
+
+        virtual Complex Evaluate() override;
+        virtual bool HasError() override;
+        virtual std::string GetErrorReason() override;
+        
+        std::string Reason;
     };
 
 }

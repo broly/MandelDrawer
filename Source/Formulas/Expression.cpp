@@ -31,6 +31,18 @@ Complex UnaryExpression::Evaluate()
     return {};
 }
 
+bool UnaryExpression::HasError()
+{
+    return Argument->HasError();
+}
+
+std::string UnaryExpression::GetErrorReason()
+{
+    if (Argument->HasError())
+        return Argument->GetErrorReason();
+    return "";
+}
+
 Complex BinaryExpression::Evaluate()
 {
     if (const auto func_info = FindBy(BinaryOperators, [=] (const BinaryOperator& v) { return Token == v.Token; }))
@@ -41,6 +53,20 @@ Complex BinaryExpression::Evaluate()
     }
     
     return {};
+}
+
+bool BinaryExpression::HasError()
+{
+    return Left->HasError() || Right->HasError();
+}
+
+std::string BinaryExpression::GetErrorReason()
+{
+    if (Left->HasError())
+        return Left->GetErrorReason();
+    if (Right->HasError())
+        return Right->GetErrorReason();
+    return "";
 }
 
 template<typename T>
@@ -70,6 +96,16 @@ Complex NumberExpression::Evaluate()
     return CachedNumber;
 }
 
+bool NumberExpression::HasError()
+{
+    return false;
+}
+
+std::string NumberExpression::GetErrorReason()
+{
+    return "";
+}
+
 Complex VariableExpression::Evaluate()
 {
     if (Vars)
@@ -80,4 +116,29 @@ Complex VariableExpression::Evaluate()
         }
 
     throw std::runtime_error(std::string("Can't find variable: ") + Token);
+}
+
+bool VariableExpression::HasError()
+{
+    return false;
+}
+
+std::string VariableExpression::GetErrorReason()
+{
+    return "";
+}
+
+Complex ErrorExpression::Evaluate()
+{
+    return {};
+}
+
+bool ErrorExpression::HasError()
+{
+    return true;
+}
+
+std::string ErrorExpression::GetErrorReason()
+{
+    return Reason;
 }

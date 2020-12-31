@@ -25,6 +25,8 @@ namespace Mandel
     
         Complex EvaluateOnFly();
 
+        bool GetError(std::string& Reason);
+
 
     protected:
     
@@ -35,5 +37,9 @@ namespace Mandel
         std::shared_ptr<ExpressionBase> FormulaExpression;
     
         bool bHasDirtyFormula;
+
+        bool bHasError;
+
+        std::string ErrorReason;
     };
 }
