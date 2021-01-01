@@ -15,7 +15,6 @@ SOURCES += \
     Source/Color.cpp \
     Source/Formulas/Expression.cpp \
     Source/Formulas/Formula.cpp \
-    Source/Formulas/FormulaCompiler.cpp \
     Source/Formulas/FormulaInterpreter.cpp \
     Source/Formulas/Parser.cpp \
     Source/Main.cpp
