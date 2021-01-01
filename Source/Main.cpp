@@ -7,7 +7,6 @@
 #include "MandelDrawer.h"
 #include "Animation.h"
 #include "Formulas/Formula.h"
-#include "Formulas/FormulaCompiler.h"
 #include "Formulas/FormulaInterpreter.h"
 #include "Formulas/Parser.h"
 

@@ -154,7 +154,6 @@
     <ClCompile Include="Source/Main.cpp" />
     <ClCompile Include="Source\Formulas\Expression.cpp" />
     <ClCompile Include="Source\Formulas\Formula.cpp" />
-    <ClCompile Include="Source\Formulas\FormulaCompiler.cpp" />
     <ClCompile Include="Source\Formulas\FormulaInterpreter.cpp" />
     <ClCompile Include="Source\Formulas\Parser.cpp" />
   </ItemGroup>
@@ -165,7 +164,6 @@
     <ClInclude Include="Source\Formulas\Common.h" />
     <ClInclude Include="Source\Formulas\Expression.h" />
     <ClInclude Include="Source\Formulas\Formula.h" />
-    <ClInclude Include="Source\Formulas\FormulaCompiler.h" />
     <ClInclude Include="Source\Formulas\FormulaInterpreter.h" />
     <ClInclude Include="Source\Formulas\Functions.h" />
     <ClInclude Include="Source\Formulas\OpCodeDefs.h" />
