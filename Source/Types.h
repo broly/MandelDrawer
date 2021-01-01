@@ -15,6 +15,6 @@ namespace Mandel
     typedef signed long long int64;
 
 
-    using Float = float;
+    using Float = double;
     using Complex = std::complex<Float>;
 }

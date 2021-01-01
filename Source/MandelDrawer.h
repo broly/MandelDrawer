@@ -107,6 +107,8 @@ namespace Mandel
 			WorkersProgress.clear();
             WorkersStatus.clear();
 
+            CustomFormula_ByWorker.resize(Settings.NumThreads, nullptr);
+
 			// We must create some amount of threads here
 			for (int i = 0; i < Settings.NumThreads; i++)
 			{
@@ -125,21 +127,6 @@ namespace Mandel
                 else
                     WorkersStatus[i] = false;
 
-                if (Settings.bUsesCustomFormula)
-                {
-
-                    Complex Value;
-
-                    if (i >= CustomFormulaZValue_ByWorker.size())
-                        CustomFormulaZValue_ByWorker.emplace_back(Value);
-                    else
-                        CustomFormulaZValue_ByWorker[i] = {};
-
-                    if (i >= CustomFormula_ByWorker.size())
-                        CustomFormula_ByWorker.emplace_back(nullptr);
-                    else
-                        CustomFormula_ByWorker[i] = nullptr;
-                }
 
 				if (Settings.MandelDrawMethod == EMandelDrawMethod::MultiThreaded_ByPixelOrder)
 				{
@@ -180,7 +167,7 @@ namespace Mandel
 				auto CustomFormula = std::make_shared<Formula>();
 				CustomFormula->SetFormula(Settings.CustomFormula);
 
-				CustomFormula->SetVariable("z", &CustomFormulaZValue_ByWorker[WorkerID]);
+                CustomFormula->SetVariable("z", nullptr);
 
 				CustomFormula->Parse();
 
@@ -191,10 +178,12 @@ namespace Mandel
 				else
 				{
 					auto Variables = std::make_shared<VariablesList>();
+                    Variables->Vars.insert({ "z", nullptr });
 					CustomFormula->SetVariables(Variables);
 				}
 
 				CustomFormula_ByWorker[WorkerID] = CustomFormula;
+				CustomFormula_ByWorker[WorkerID]->Compile();
 			}
 
 			switch (Settings.MandelDrawMethod)
@@ -244,6 +233,9 @@ namespace Mandel
 					CookImage();
 					return;
 				}
+
+				float progress = Sum(WorkersProgress) / Settings.NumThreads;
+				std::cout << "Progress: " << progress << "\r";
 				
 				using namespace std::chrono_literals;
 				std::this_thread::sleep_for(10ms);
@@ -297,11 +289,11 @@ namespace Mandel
 			const FloatVector2D Point_Rel = (Point_Screen - Settings.Resolution/2.f) / (Settings.Resolution * Settings.DrawScale) - Settings.DrawOffset;
 				
 			Complex c(Point_Rel.X, Point_Rel.Y);
-			Float m = Fractal(c, WorkerID);
+            float m = Fractal(c, WorkerID);
 
 			// TODO: Example with HSV
 			Color color = LinearColor {
-				((m / Settings.IterLimit) * 480) + 45,
+                ((m / Settings.IterLimit) * 480) + 45,
                 0.7f,
                 ((m / (float)Settings.IterLimit) == 0) ? (m / Settings.IterLimit * 6) : 1,
             }.HSV2RGB() ^ 2;
@@ -334,27 +326,23 @@ namespace Mandel
 		Float Fractal(Complex InC, int WorkerID) const
 		{
 			Complex z = InC;
+			
+            if (Settings.bUsesCustomFormula)
+                CustomFormula_ByWorker[WorkerID]->SetVariable("z", &z);
 
-			if (Settings.bUsesCustomFormula)
-			{
-                if (WorkerID < CustomFormulaZValue_ByWorker.size())
-                    CustomFormulaZValue_ByWorker[WorkerID] = z;
-				CustomFormula_ByWorker[WorkerID]->SetVariable("z", &CustomFormulaZValue_ByWorker[WorkerID]);
-			}
-		
 			const Complex c = Settings.bJuliaMode ? Complex(Settings.JuliaValue.X, Settings.JuliaValue.Y) : InC;
 			int n = 0;
+			
 			while (abs(z) <= Settings.EscapeValue and n < Settings.IterLimit)
 			{
 				if (!Settings.bUsesCustomFormula)
 				{
-                    z = 1.f/(z*z) + c;
+                    z = (std::pow(z, 2)) + c;
 				}
 				else
 				{
-					z = CustomFormula_ByWorker[WorkerID]->EvaluateOnFly() + c;
-                    if (WorkerID < CustomFormulaZValue_ByWorker.size())
-                        CustomFormulaZValue_ByWorker[WorkerID] = z;
+					z = CustomFormula_ByWorker[WorkerID]->EvaluateCompiled();
+					z += c;
 				}
 				// z = Settings.CustomFormula.EvaluateOnFly();
 			
@@ -437,7 +425,6 @@ namespace Mandel
 		std::function<void(float)> OnProgressChanged;
 
 		mutable std::vector<std::shared_ptr<Formula>> CustomFormula_ByWorker;
-		mutable std::vector<Complex> CustomFormulaZValue_ByWorker;
 
 		std::atomic<bool> bIsBusy;
 

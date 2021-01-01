@@ -3,7 +3,7 @@
 
 /** Defines color component/channel swapping function */
 #define DEFINE_CHANNEL_SWAPPER(Type, ReorderName, A, B, C) \
-Type ReorderName() const { return Type(A, B, C); }
+	Type ReorderName() const { return Type(A, B, C); }
 
 
 namespace Mandel

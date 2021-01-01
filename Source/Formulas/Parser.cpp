@@ -150,6 +150,7 @@ std::shared_ptr<ExpressionBase> Parser::ParseBinary(int min_priority)
 
 std::shared_ptr<ExpressionBase> Parser::Parse()
 {
+    Input = Source.c_str();
     return ParseBinary(0);
 }
 

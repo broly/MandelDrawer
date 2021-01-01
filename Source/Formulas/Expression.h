@@ -2,12 +2,51 @@
 #include <complex>
 #include <memory>
 #include <string>
+#include <strstream>
+
 
 #include "Common.h"
+#include "OpCodes.h"
+
 
 namespace Mandel
 {
     struct VariablesList;
+
+    struct CompilationInfo
+    {
+        CompilationInfo()
+        {
+            SlotsCounter = 0;
+        }
+        
+        OpCodeSequence Buffer;
+
+        uint16 LastSlot;
+
+        std::map<std::string, uint16> VariableSlots;
+
+        uint16 SlotsCounter;
+
+        uint16 GetMemSlotFor(std::string VariableName)
+        {
+            for (auto& pair : VariableSlots)
+            {
+                if (pair.first == VariableName)
+                    return pair.second;
+            }
+
+            uint8 NewSlot = VariableSlots.size();
+            VariableSlots.insert({VariableName, NewSlot});
+            return NewSlot;
+            
+        }
+
+        uint16 GetNewSlot()
+        {
+            return SlotsCounter++;
+        }
+    };
 
     struct ExpressionBase
     {
@@ -24,6 +63,8 @@ namespace Mandel
         virtual bool HasError() = 0;
 
         virtual std::string GetErrorReason() = 0;
+
+        virtual void Compile(CompilationInfo& Info, uint16& LastSlot) = 0;
     };
 
 
@@ -39,6 +80,7 @@ namespace Mandel
         virtual Complex Evaluate() override;
         virtual bool HasError() override;
         virtual std::string GetErrorReason() override;
+        virtual void Compile(CompilationInfo& Info, uint16& LastSlot) override;
     };
 
 
@@ -48,7 +90,7 @@ namespace Mandel
         BinaryExpression(std::string InToken, std::shared_ptr<ExpressionBase> InLeft, std::shared_ptr<ExpressionBase> InRight)
             : ExpressionBase(InToken)
             , Left{InLeft}
-        , Right{InRight}
+            , Right{InRight}
         {}
         std::shared_ptr<ExpressionBase> Left;
         std::shared_ptr<ExpressionBase> Right;
@@ -57,6 +99,7 @@ namespace Mandel
         virtual Complex Evaluate() override;
         virtual bool HasError() override;
         virtual std::string GetErrorReason() override;
+        virtual void Compile(CompilationInfo& Info, uint16& LastSlot) override;
     };
 
     struct NumberExpression : ExpressionBase
@@ -72,6 +115,9 @@ namespace Mandel
         virtual Complex Evaluate() override;
         virtual bool HasError() override;
         virtual std::string GetErrorReason() override;
+        virtual void Compile(CompilationInfo& Info, uint16& LastSlot) override;
+        
+        uint16 _StoredSlot;
     };
 
 
@@ -87,8 +133,11 @@ namespace Mandel
         virtual Complex Evaluate() override;
         virtual bool HasError() override;
         virtual std::string GetErrorReason() override;
+        virtual void Compile(CompilationInfo& Info, uint16& LastSlot) override;
     
         std::shared_ptr<VariablesList> Vars;
+
+        uint16 _StoredSlot;
     };
 
     struct ErrorExpression : ExpressionBase
@@ -101,6 +150,7 @@ namespace Mandel
         virtual Complex Evaluate() override;
         virtual bool HasError() override;
         virtual std::string GetErrorReason() override;
+        virtual void Compile(CompilationInfo& Info, uint16& LastSlot) override;
         
         std::string Reason;
     };

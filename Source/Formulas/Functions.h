@@ -45,7 +45,7 @@ namespace Mandel
     * List of all single-arg functions
     * TODO: register each function here!
     */
-    static std::vector<SingleFunctionInfo> SingleFunctions = {
+    static SingleFunctionInfo SingleFunctions[] = {
         {"sin", _SingleFunctions::sin},
         {"cos", _SingleFunctions::cos},
         {"tan", _SingleFunctions::tan},

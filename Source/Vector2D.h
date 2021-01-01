@@ -34,6 +34,22 @@ namespace Mandel
 			return TVector2D(X + Other.X, Y + Other.Y);
 		}
 
+        template<typename U>
+        TVector2D operator+=(TVector2D<U> Other)
+        {
+            *this = *this + Other;
+            return *this;
+        }
+
+        template<typename U>
+        TVector2D operator=(TVector2D<U> Other)
+        {
+            X = Other.X;
+            Y = Other.Y;
+            return *this;
+        }
+
+
 		template<typename U>
         TVector2D operator-(TVector2D<U> Other) const
 		{

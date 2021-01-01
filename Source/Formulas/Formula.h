@@ -5,6 +5,8 @@
 #include "../Types.h"
 #include <iostream>
 
+#include "FormulaInterpreter.h"
+
 namespace Mandel
 {
     class Formula
@@ -14,6 +16,8 @@ namespace Mandel
     
         Formula(std::string InInputFormula, std::shared_ptr<VariablesList> Vars = nullptr);
 
+        ~Formula();
+
 
         void SetFormula(std::string InInputFormula);
 
@@ -21,9 +25,13 @@ namespace Mandel
 
         void SetVariable(std::string VarName, Complex* Var);
 
+        void Compile();
+
         void Parse();
     
         Complex EvaluateOnFly();
+
+        Complex EvaluateCompiled();
 
         bool GetError(std::string& Reason);
 
@@ -41,5 +49,7 @@ namespace Mandel
         bool bHasError;
 
         std::string ErrorReason;
+
+        FormulaInterpreter Interpreter;
     };
 }

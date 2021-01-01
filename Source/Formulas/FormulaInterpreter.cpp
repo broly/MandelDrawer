@@ -9,39 +9,85 @@
 
 using namespace Mandel;
 
+void FormulaInterpreter::SetCompiledData(CompilationInfo& CompileInfo, uint8  InLastSlot)
+{
+    CompiledData = CompileInfo;
+    LastSlot = InLastSlot;
+
+    Bytecode = CompiledData.Buffer.Data;
+    Bytecode_Size = Bytecode.size();
+    MemSlots.clear();
+    Slots.clear();
+    for (auto& NameSlot_Pair : CompiledData.VariableSlots)
+    {
+        for (auto& NamePtr_Pair : Vars->Vars)
+        {
+            if (NameSlot_Pair.first == NamePtr_Pair.first)
+            {
+                SetAtMemSlot(NameSlot_Pair.second, NamePtr_Pair.second);
+            }
+        }
+    }
+}
+
+void FormulaInterpreter::SetVars(std::shared_ptr<VariablesList> InVars)
+{
+    Vars = InVars;
+}
+
 void FormulaInterpreter::SetVariables(std::vector<Complex*> VarsList)
 {
     MemSlots = VarsList;
 }
 
+void FormulaInterpreter::SetVariable(std::string Name, Complex* VarPtr)
+{
+    uint16 Slot = CompiledData.VariableSlots[Name];
+    SetAtMemSlot(Slot, VarPtr);
+}
+
+
+FORCEINLINE static void HandleOpCode(EOpCode OpCode, FormulaInterpreter* Interpreter, uint8*& Bytecode)
+{
+    switch (OpCode)
+    {
+        case EOpCode::OP_LOAD:  return OpCodes::LOAD(*Interpreter, Bytecode);
+        case EOpCode::OP_MOVC:  return OpCodes::MOVC(*Interpreter, Bytecode);
+        case EOpCode::OP_CALL1: return OpCodes::CALL1(*Interpreter, Bytecode);
+        case EOpCode::OP_CALL2: return OpCodes::CALL2(*Interpreter, Bytecode);
+    }
+}
+
 Complex FormulaInterpreter::Execute()
 {
     uint8* MostRecentBytecodePtr = Bytecode.data();
+
+    const uint8* EndPtr = MostRecentBytecodePtr + Bytecode_Size;
     
-    uint32 CommandIndex = 0;
-    while (CommandIndex < CommandsNum)
+    while (true)
     {
         // Read opcode
-        EOpCode OpCode = (EOpCode)MostRecentBytecodePtr[0];
+        const uint8 OpCode = MostRecentBytecodePtr[0];
+
+#ifndef DEBUG_INTERPRETER
         auto iter = AllowedOpCodes.find(OpCode);
         if (iter == AllowedOpCodes.end())
         {
             printf("Omg!");
             return {0.f, 0.f};
         }
+#endif
         
-        // Get opcode callback, todo: optimize from map to array
-        auto OpCallback = InstructionsInfo[OpCode];
-        // Shift from opcode to operands
-        StepBytecode<uint8>(MostRecentBytecodePtr, OpCode2Str(OpCode));
-        // Call opcode action with operands
-        OpCallback(*this, MostRecentBytecodePtr);
-        // Next command
-        CommandIndex++;
+        StepBytecode(uint8, MostRecentBytecodePtr, OpCode2Str((EOpCode)OpCode));
+        HandleOpCode((EOpCode)OpCode, this, MostRecentBytecodePtr);
+
+        if (MostRecentBytecodePtr >= EndPtr)
+            break;
     }
 
-    return {0.f, 0.f};
+    return GetAtSlot(LastSlot);
 }
+
 
 void FormulaInterpreter::SetAtSlot(uint32 SlotIndex, Complex& Value)
 {
@@ -55,33 +101,17 @@ Complex& FormulaInterpreter::GetAtSlot(uint32 SlotIndex)
     return Slots[SlotIndex];
 }
 
-void FormulaInterpreter::CopyToSlotFromSlot(uint32 DestSlotIndex, uint32 SourceSlotIndex)
-{
-    Complex& Value = Slots[SourceSlotIndex];
-    SetAtSlot(DestSlotIndex, Value);
-}
-
-void FormulaInterpreter::PushSlotIndex(int32 SlotIndex)
-{
-    SlotsStack.push_back(SlotIndex);
-}
-
 Complex& FormulaInterpreter::GetAtMemSlot(uint32 MemSlotIndex) const
 {
     Complex* ValuePtr = MemSlots[MemSlotIndex];
     return *ValuePtr;
 }
 
-uint16 FormulaInterpreter::Read_SlotIndex(uint8*& Bytecode)
+void FormulaInterpreter::SetAtMemSlot(uint32 MemSlotIndex, Complex* ValuePtr)
 {
-    const uint16 Result = *(uint16*)Bytecode;
-    StepBytecode<uint16>(Bytecode, "READ SLOT INDEX");
-    return Result;
-}
-
-Complex* FormulaInterpreter::Read_ValuePtr(uint8*& Bytecode)
-{
-    Complex* Result = (Complex*)Bytecode;
-    StepBytecode<Complex>(Bytecode, "READ COMPLEX NUMBER");
-    return Result;
+    if (MemSlotIndex >= MemSlots.size())
+    {
+        MemSlots.resize(MemSlotIndex + 1);
+    }
+    MemSlots[MemSlotIndex] = ValuePtr;
 }

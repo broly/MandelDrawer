@@ -5,86 +5,96 @@
 #include <map>
 #include <vector>
 
+
+#include "Expression.h"
 #include "../Types.h"
+#include "../CommonTools.h"
 #include "OpCodes.h"
+
+#define DEBUG_INTERPRETER 0
+
+#if DEBUG_INTERPRETER
+    #define StepBytecode(type, ByteCodePtrRef, Msg) _StepBytecode<type>(ByteCodePtrRef, Msg)
+#else
+    #define StepBytecode(type, ByteCodePtrRef, Msg) _StepBytecode<type>(ByteCodePtrRef, nullptr)
+#endif
 
 namespace Mandel
 {
     class FormulaInterpreter
     {
     public:
+        FormulaInterpreter()
+            : LastSlot(0)
+            , Bytecode_Size(0)
+        {
+            Slots.resize(20);
+        }
+        
         void SetVariables(std::vector<Complex*> VarsList);
+
+        void SetVariable(std::string Name, Complex* VarPtr);
 
         Complex Execute();
 
 
         void SetAtSlot(uint32 SlotIndex, Complex& Value);
         Complex& GetAtSlot(uint32 SlotIndex);
-        void CopyToSlotFromSlot(uint32 DestSlotIndex, uint32 SourceSlotIndex);
-        void PushSlotIndex(int32 SlotIndex);
         Complex& GetAtMemSlot(uint32 MemSlotIndex) const;
+        void SetAtMemSlot(uint32 MemSlotIndex, Complex* ValuePtr);
 
         template<typename T>
-        void StepBytecode(uint8*& ByteCodePtrRef, const char* Reason = nullptr);
+        FORCEINLINE void _StepBytecode(uint8*& ByteCodePtrRef, const char* Reason = nullptr)
+        {
+            T Value = *(T*)(ByteCodePtrRef);
+            ByteCodePtrRef += sizeof(T);
+#if DEBUG_INTERPRETER
+            if (Reason)
+                std::cout << std::dec << "STEP BYTECODE +" << sizeof(T) << " (" << Reason << ")" << "   V: " << std::hex << "0x" << Value << std::endl;
+            else
+                std::cout << "STEP BYTECODE +" << sizeof(T) << std::endl;
+#endif
+        }
 
-        uint16 Read_SlotIndex(uint8*& Bytecode);
-        Complex* Read_ValuePtr(uint8*& Bytecode);
+        FORCEINLINE uint16 Read_SlotIndex(uint8*& Bytecode)
+        {
+            const uint16 Result = *(uint16*)Bytecode;
+            StepBytecode(uint16, Bytecode, "READ SLOT INDEX");
+            return Result;
+        }
+        
+        FORCEINLINE Complex* Read_ValuePtr(uint8*& Bytecode)
+        {
+            Complex* Result = (Complex*)Bytecode;
+            StepBytecode(Complex, Bytecode, "READ COMPLEX NUMBER");
+            return Result;
+        }
+
+        
+        void SetCompiledData(CompilationInfo& CompileInfo, uint8 LastSlot);
+
+        void SetVars(std::shared_ptr<VariablesList> InVars);
+
+        FORCEINLINE bool HasCompiledData() const
+        {
+            return Bytecode_Size > 0;
+        }
     
 
-        std::vector<std::map<char*, Complex*>> Vars;
+        std::shared_ptr<VariablesList> Vars;
 
         std::vector<uint8> Bytecode;
-        uint32 CommandsNum;
+
+        uint32 Bytecode_Size;
 
         std::vector<Complex> Slots;
         std::vector<Complex*> MemSlots;
 
         std::vector<int32> SlotsStack;
+
+        CompilationInfo CompiledData;
+        uint16 LastSlot;
     };
 
-    template <typename T>
-    void FormulaInterpreter::StepBytecode(uint8*& ByteCodePtrRef, const char* Reason)
-    {
-        T Value = *(T*)(ByteCodePtrRef);
-        ByteCodePtrRef += sizeof(T);
-        if (Reason)
-            std::cout << std::dec << "STEP BYTECODE +" << sizeof(T) << " (" << Reason << ")" << "   V: " << std::hex << "0x" << Value << std::endl;
-        else
-            std::cout << "STEP BYTECODE +" << sizeof(T) << std::endl;
-    }
 
-
-    // 5 + abs(x - sin(5 * x - 3 * x) / 32 * x) - 5 * y - pow(y - 2, x * sin(5 * x * (y - 6)))
-
-    //                    // LOAD  0, [x]
-    //                    // LOAD  1, [y]
-    //                    // MOV   2, 1
-    // a = (y - 6)        // SUB   2, (6, 0)
-    // a = x * a          // MUL   2, [0]
-    // a = 5 * a          // MUL   2, (5, 0)
-    // a = sin(a)         // PUSH  2
-    //                    // CALL  [sin]
-    // b = y - 2          // MOV   3, 1
-    //                    // SUB   3, (2, 0)
-    // a = pow(b, a)      // PUSH  3
-    //                    // PUSH  2
-    //                    // CALL  [pow]
-    // a = y - a          // SUBI  2, 1
-    // a = 5 * a          // MUL   2, (5, 0)
-
-    // c = 3 * x          // MOV   4, 0
-    //                    // MUL   4, (3, 0)
-    // d = 5 * x          // MOV   5, 0
-    //                    // MUL   5, (5, 0)
-    // c = d - c          // SUBI  4, 5 
-    // c = sin(c)         // PUSH  4
-    //                    // CALL [sin]
-    // c = c / 32         // DIV   4, (32, 0)
-    // c = c * x          // MUL   4, 1
-    // c = x - c          // SUBI  4, 0 
-    // c = abs(c)         // PUSH  4
-    // CALL [abs]
-
-    // a = c - a          // SUBI 2, 4
-    // a = 5 + a          // ADD  2, (5, 0)
 }

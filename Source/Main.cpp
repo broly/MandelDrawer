@@ -41,7 +41,8 @@ int main()
 	// fi.Execute();
 	// std::cout << fi.Slots[fi.SlotsStack[0]];
 
-	MandelDrawerSettings Settings	
+
+	const MandelDrawerSettings Settings	
 	{
 		{2048, 2048},
 		16,
@@ -53,15 +54,15 @@ int main()
 		{},
 		{},
 		EMandelDrawMethod::MultiThreaded_ByPixelOrder,
-		false,
-		"z^(-2)",
+		true,
+		"z^-2",
 		nullptr
 	};
 
 	auto t = std::clock();
 
 	Animation One(
-		1000,
+		1,
 		{
 			{0.0, {0.0, 0.0}},
 			{1.0, {0.3, 0.0}},
@@ -75,11 +76,11 @@ int main()
 			{9.0, {-1.309, 0.f}},
 			{10.0, {-1.767, 0.f}},
 			{11.0, {-2.f, 0.f}},
-		}, Settings, 8820);
+		}, Settings, 5);
 
 	One.StartAnimation();
 
-	std::cout << "Total time: " << std::clock() - t << std::endl;
+	std::cout << "Total time: " <<(std::clock() - t)/(double) CLOCKS_PER_SEC << std::endl;
 
 	
 	//system(); //открывает бмп

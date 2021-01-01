@@ -22,6 +22,8 @@ void QGraphicsView_MandelDrawer::mouseMoveEvent(QMouseEvent *event)
         // _panStartX = event->x();
         // _panStartY = event->y();
         OnPan({event->x() - _panStartX, event->y() - _panStartY});
+        _panStartX = event->x();
+        _panStartY = event->y();
         setCursor(Qt::ClosedHandCursor);
         event->accept();
         return;

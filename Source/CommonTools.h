@@ -4,6 +4,8 @@
 #include <numeric>
 #include <ctime>
 
+#define FORCEINLINE __forceinline
+
 namespace Mandel
 {
 	/**
@@ -91,5 +93,41 @@ namespace Mandel
 			if (Predicate(v))
 				return &v;
 		return nullptr;
+	}
+
+	template<typename T, typename Pred>
+	const T* FindBy(const T V[], Pred&& Predicate)
+	{
+		for (size_t Index = 0; Index < sizeof(V); Index++)
+		{
+			auto& v = V[Index];
+			if (Predicate(v))
+				return &v;
+		}
+		return nullptr;
+	}
+
+	template<typename T, typename Pred>
+    const size_t IndexOf(const std::vector<T>& V, Pred&& Predicate)
+	{
+		for (size_t Index = 0; Index < std::size(V); Index++)
+		{
+			auto& v = V[Index];
+			if (Predicate(v))
+				return Index;
+		}
+		return -1;
+	}
+
+	template<typename T, typename Pred>
+	const size_t IndexOf(const T V[], Pred&& Predicate)
+	{
+		for (size_t Index = 0; Index < sizeof(V); Index++)
+		{
+			auto& v = V[Index];
+			if (Predicate(v))
+				return Index;
+		}
+		return -1;
 	}
 }

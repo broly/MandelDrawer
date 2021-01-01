@@ -1,5 +1,7 @@
 ﻿#include "Expression.h"
 
+
+#include <iostream>
 #include <string>
 
 
@@ -9,6 +11,10 @@
 #include "../CommonTools.h"
 #include <sstream>
 #include <string>
+
+#include "OpCodes.h"
+
+#define DEBUG_COMPILING 0
 
 using namespace Mandel;
 
@@ -43,6 +49,22 @@ std::string UnaryExpression::GetErrorReason()
     return "";
 }
 
+void UnaryExpression::Compile(CompilationInfo& Info, uint16& LastSlot)
+{
+    Argument->Compile(Info, LastSlot);
+    
+    const uint16 func_index = IndexOf(SingleFunctions, [=] (const SingleFunctionInfo& v) { return v.FunctionName == Token; });
+
+    if (func_index != -1)
+    {
+        Info.Buffer << EOpCode::OP_CALL1 << func_index << LastSlot;
+#if DEBUG_COMPILING
+        std::cout << "COMPILING     " << "CALL1  " << func_index << ", " << LastSlot << std::endl;
+#endif
+    }
+}
+
+
 Complex BinaryExpression::Evaluate()
 {
     if (const auto func_info = FindBy(BinaryOperators, [=] (const BinaryOperator& v) { return Token == v.Token; }))
@@ -67,6 +89,27 @@ std::string BinaryExpression::GetErrorReason()
     if (Right->HasError())
         return Right->GetErrorReason();
     return "";
+}
+
+void BinaryExpression::Compile(CompilationInfo& Info, uint16& LastSlot)
+{
+    uint16 LeftSlot = 0;
+    uint16 RightSlot = 0;
+    
+    Left->Compile(Info, LeftSlot);
+    Right->Compile(Info, RightSlot);
+    
+    const uint16 func_index = IndexOf(BinaryOperators, [=] (const BinaryOperator& v) { return Token == v.Token; });
+
+    if (func_index != -1)
+    {
+        Info.Buffer << EOpCode::OP_CALL2 << func_index << LeftSlot << RightSlot;
+#if DEBUG_COMPILING
+        std::cout << "COMPILING     " << "CALL2  " << func_index << ", " << LastSlot << ", " << RightSlot << std::endl;
+#endif
+    }
+
+    LastSlot = LeftSlot;
 }
 
 template<typename T>
@@ -106,6 +149,19 @@ std::string NumberExpression::GetErrorReason()
     return "";
 }
 
+void NumberExpression::Compile(CompilationInfo& Info, uint16& LastSlot)
+{
+    const uint16 Slot = Info.GetNewSlot();
+    const Complex Value = Evaluate();
+
+    Info.Buffer << EOpCode::OP_MOVC << Slot << Value;
+#if DEBUG_COMPILING
+    std::cout << "COMPILING     " << "MOVC   " << Slot << ", " << Value << std::endl;
+#endif
+
+    LastSlot = Slot;
+}
+
 Complex VariableExpression::Evaluate()
 {
     if (Vars)
@@ -128,6 +184,19 @@ std::string VariableExpression::GetErrorReason()
     return "";
 }
 
+void VariableExpression::Compile(CompilationInfo& Info, uint16& LastSlot)
+{
+    const uint16 MemSlot = Info.GetMemSlotFor(Token);
+    const uint16 Slot = Info.GetNewSlot();
+    
+    Info.Buffer << EOpCode::OP_LOAD << Slot << MemSlot;
+#if DEBUG_COMPILING
+    std::cout << "COMPILING     " << "LOAD   " << MemSlot << ", " << Slot << std::endl;
+#endif
+
+    LastSlot = Slot;
+}
+
 Complex ErrorExpression::Evaluate()
 {
     return {};
@@ -142,3 +211,9 @@ std::string ErrorExpression::GetErrorReason()
 {
     return Reason;
 }
+
+void ErrorExpression::Compile(CompilationInfo& Info, uint16& LastSlot)
+{
+    
+}
+

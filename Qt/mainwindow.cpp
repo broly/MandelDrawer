@@ -38,7 +38,7 @@ void MainWindow::InitializeMandelDrawer()
         0.5f,
     };
 
-    Settings.CustomFormula = "z^-2";
+    Settings.CustomFormula = "z^2";
 
     MandelDrawer.SetSettings(Settings);
 
@@ -124,7 +124,9 @@ void MainWindow::OnZoom(float Delta)
 
 void MainWindow::OnPan(QPoint Delta)
 {
-    CurrentPan = Mandel::FloatVector2D((CurrentPan.X + Delta.x()) / 100.f, (CurrentPan.Y + Delta.y()) / 100.f);
+    Mandel::FloatVector2D delta(Delta.x(), Delta.y());
+
+    CurrentPan += (delta / 100.f) / CurrentZoomValue;
     bHasPendingRedraw = true;
 }
 
